@@ -1,0 +1,96 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client"
+  output   = "../generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+model User {
+  id            String          @id @default(uuid())
+  email         String          @unique
+  phoneNumber   String?
+  pushToken     String?
+  preferences   UserPreference?
+  notifications Notification[]
+
+  @@map("users")
+}
+
+model UserPreference {
+  userId     String  @id
+  user       User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+  allowEmail Boolean @default(true)
+  allowSMS   Boolean @default(true)
+  allowPush  Boolean @default(true)
+
+  @@map("user_preferences")
+}
+
+model Notification {
+  id           String               @id @default(uuid())
+  externalId   String?              @unique
+  user         User?                @relation(fields: [userId], references: [id], onDelete: SetNull)
+  userId       String?
+  templateName String
+  content      Json
+  priority     NotificationPriority @default(LOW)
+  status       NotificationStatus   @default(PENDING)
+  createdAt    DateTime             @default(now())
+  logs         NotificationLog[]
+
+  @@index([userId, status])
+  @@index([createdAt])
+  @@index([status, priority])
+  @@map("notifications")
+}
+
+model NotificationLog {
+  id             String                @id @default(uuid())
+  notificationId String
+  notification   Notification          @relation(fields: [notificationId], references: [id], onDelete: Cascade)
+  channel        String
+  status         NotificationLogStatus
+  errorMessage   String?
+  sentAt         DateTime              @default(now())
+
+  @@index([notificationId])
+  @@index([sentAt])
+  @@map("notification_logs")
+}
+
+model IdempotencyKey {
+  key            String   @id
+  responseStatus Int
+  responseBody   Json
+  createdAt      DateTime @default(now())
+  expiresAt      DateTime // Para limpeza automática
+
+  @@index([expiresAt])
+  @@map("idempotency_keys")
+}
+
+enum NotificationPriority {
+  HIGH // Ex: Senha, 2FA
+  MEDIUM // Ex: Atualização de pedido
+  LOW // Ex: Marketing
+}
+
+enum NotificationStatus {
+  PENDING
+  SENT
+  FAILED
+  CANCELED
+}
+
+enum NotificationLogStatus {
+  SUCCESS
+  FAILED
+}
