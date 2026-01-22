@@ -1,7 +1,9 @@
 import {
+  BadRequestException,
   Body,
   ConflictException,
   Controller,
+  Headers,
   HttpCode,
   Post,
   UsePipes
@@ -10,8 +12,10 @@ import { ZodValidationPipe } from "src/common/pipes/zod-validation-pipe";
 import { PrismaService } from "src/prisma/prisma.service";
 import {
   createNotificationBodySchema,
-  CreateNotificationDto
+  CreateNotificationDto,
+  idempotencyKeySchema
 } from "../dtos/create-notification.dto";
+import { z } from "zod";
 
 @Controller("/notifications")
 export class CreateNotificationController {
@@ -20,8 +24,25 @@ export class CreateNotificationController {
   @Post()
   @HttpCode(201)
   @UsePipes(new ZodValidationPipe(createNotificationBodySchema))
-  async handle(@Body() body: CreateNotificationDto) {
+  async handle(@Headers() rawHeader: any, @Body() body: CreateNotificationDto) {
+    const { success, data, error } = idempotencyKeySchema.safeParse(rawHeader);
     const request = body;
+
+    if (!success) {
+      throw new BadRequestException({
+        message: "Validation failed",
+        issues: z.treeifyError(error)
+      });
+    }
+
+    const alreadyHasIdempotencyKey =
+      await this.checkIdempotencyKeyAlreadyExists(data["idempotency-key"]);
+
+    if (alreadyHasIdempotencyKey) {
+      throw new ConflictException(
+        "Idempotency key already exists. Please provide a new idempotency key."
+      );
+    }
 
     const alreadyHasNotification = await this.checkNotificationAlreadyExists(
       request.externalId
@@ -42,8 +63,21 @@ export class CreateNotificationController {
     externalId?: string
   ): Promise<boolean> {
     if (!externalId) return false;
-    return (
-      (await this.prisma.notification.count({ where: { externalId } })) > 0
-    );
+
+    const alreadyExists = await this.prisma.notification.count({
+      where: { externalId }
+    });
+
+    return alreadyExists > 0;
+  }
+
+  private async checkIdempotencyKeyAlreadyExists(
+    idempotencyKey: string
+  ): Promise<boolean> {
+    const alreadyExists = await this.prisma.idempotencyKey.count({
+      where: { key: idempotencyKey }
+    });
+
+    return alreadyExists > 0;
   }
 }

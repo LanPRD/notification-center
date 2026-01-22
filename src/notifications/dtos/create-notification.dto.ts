@@ -10,6 +10,10 @@ export const createNotificationBodySchema = z.object({
   externalId: z.string().optional()
 });
 
+export const idempotencyKeySchema = z.object({
+  "idempotency-key": z.uuid()
+});
+
 export class CreateNotificationDto extends createZodDto(
   createNotificationBodySchema
 ) {}
