@@ -1,6 +1,7 @@
 import { Module } from "@nestjs/common";
 import { ConfigModule } from "@nestjs/config";
 import { CreateNotificationController } from "./controllers/create-notification.controller";
+import { CreateUserController } from "./controllers/create-user.controller";
 import { PrismaService } from "./prisma/prisma.service";
 
 @Module({
@@ -9,7 +10,7 @@ import { PrismaService } from "./prisma/prisma.service";
       isGlobal: true // .env
     })
   ],
-  controllers: [CreateNotificationController],
+  controllers: [CreateNotificationController, CreateUserController],
   providers: [PrismaService]
 })
 export class AppModule {}

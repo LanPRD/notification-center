@@ -14,8 +14,8 @@ import { z } from "zod";
 const createNotificationBodySchema = z.object({
   userId: z.uuid(),
   templateName: z.string().min(1),
-  content: z.record(z.string(), z.unknown()),
-  priority: z.enum($Enums.NotificationPriority).optional(),
+  content: z.record(z.string(), z.any()),
+  priority: z.enum($Enums.NotificationPriority),
   externalId: z.string().optional()
 });
 
@@ -29,14 +29,11 @@ export class CreateNotificationController {
   @HttpCode(201)
   @UsePipes(new ZodValidationPipe(createNotificationBodySchema))
   async handle(@Body() body: CreateNotificationBody) {
-    console.log("Received notification:", body);
-    const { externalId } = body;
+    const request = body;
 
-    const alreadyHasNotification = await this.prisma.notification.findUnique({
-      where: {
-        externalId
-      }
-    });
+    const alreadyHasNotification = await this.checkNotificationAlreadyExists(
+      request.externalId
+    );
 
     if (alreadyHasNotification) {
       throw new ConflictException(
@@ -44,8 +41,17 @@ export class CreateNotificationController {
       );
     }
 
-    // await this.prisma.notification.create({
-    //   data: notification
-    // });
+    await this.prisma.notification.create({
+      data: request
+    });
+  }
+
+  private async checkNotificationAlreadyExists(
+    externalId?: string
+  ): Promise<boolean> {
+    if (!externalId) return false;
+    return (
+      (await this.prisma.notification.count({ where: { externalId } })) > 0
+    );
   }
 }
