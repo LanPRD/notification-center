@@ -3,7 +3,6 @@ import { PrismaClient } from "@prisma/client";
 import "dotenv/config";
 import { execSync } from "node:child_process";
 import { randomUUID } from "node:crypto";
-import pg from "pg";
 
 const schemaId = randomUUID();
 
@@ -22,16 +21,22 @@ export let prisma: PrismaClient;
 
 beforeAll(async () => {
   const databaseURL = generateDatabaseURL(schemaId);
+
   process.env.DATABASE_URL = databaseURL;
+  process.env.DATABASE_SCHEMA = schemaId;
 
   execSync("npx prisma migrate deploy");
 
-  // Criar pool de conexão
-  const pool = new pg.Pool({ connectionString: databaseURL });
-  const adapter = new PrismaPg(pool);
+  const baseURL = process.env.DATABASE_URL!.split("?")[0];
 
-  // Passar adapter para o PrismaClient
-  prisma = new PrismaClient({ adapter });
+  const adapter = new PrismaPg(
+    { connectionString: baseURL },
+    { schema: schemaId }
+  );
+
+  prisma = new PrismaClient({
+    adapter
+  });
 
   await prisma.$connect();
 });
