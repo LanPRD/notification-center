@@ -1,3 +1,9 @@
+import type { PrismaService } from "@/infra/database/prisma/prisma.service";
+import {
+  createNotificationBodySchema,
+  idempotencyKeySchema,
+  type CreateNotificationDto
+} from "@/infra/http/dtos/create-notification.dto";
 import {
   BadRequestException,
   Body,
@@ -8,13 +14,7 @@ import {
   Post,
   UsePipes
 } from "@nestjs/common";
-import { ZodValidationPipe } from "src/common/pipes/zod-validation-pipe";
-import { PrismaService } from "src/prisma/prisma.service";
-import {
-  createNotificationBodySchema,
-  CreateNotificationDto,
-  idempotencyKeySchema
-} from "../dtos/create-notification.dto";
+import { ZodValidationPipe } from "nestjs-zod";
 import { z } from "zod";
 
 @Controller("/notifications")

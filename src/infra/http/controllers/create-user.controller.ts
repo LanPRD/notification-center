@@ -1,3 +1,4 @@
+import type { PrismaService } from "@/infra/database/prisma/prisma.service";
 import {
   Body,
   ConflictException,
@@ -12,11 +13,10 @@ import {
   ApiCreatedResponse,
   ApiTags
 } from "@nestjs/swagger";
-import { ApiStandardResponses } from "src/common/decorators/api-standard-responses.decorator";
-import { ZodValidationPipe } from "src/common/pipes/zod-validation-pipe";
-import { PrismaService } from "src/prisma/prisma.service";
-import { ErrorResponseDto } from "../../common/dtos/error-response.dto";
+import { ZodValidationPipe } from "nestjs-zod";
+import { ApiStandardResponses } from "../decorators/api-standard-responses.decorator";
 import { CreateUserDto, createUserSchema } from "../dtos/create-user.dto";
+import { ErrorResponseDto } from "../dtos/error-response.dto";
 import { UserResponseDto } from "../dtos/user-response.dto";
 
 @Controller("/users")

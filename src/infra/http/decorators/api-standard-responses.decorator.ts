@@ -6,7 +6,7 @@ import {
 import {
   ErrorResponseDto,
   ValidationErrorResponseDto
-} from "src/common/dtos/error-response.dto";
+} from "../dtos/error-response.dto";
 
 export function ApiStandardResponses() {
   return applyDecorators(
