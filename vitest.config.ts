@@ -6,7 +6,13 @@ import tsconfigPaths from "vite-tsconfig-paths";
 export default defineConfig({
   test: {
     globals: true,
-    root: "./"
+    root: "./",
+    coverage: {
+      provider: "v8",
+      reporter: ["text", "html"],
+      include: ["**/*.ts"],
+      exclude: ["**/__tests__/**", "**/*.spec.ts"]
+    }
   },
   plugins: [
     tsconfigPaths(),

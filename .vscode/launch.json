@@ -1,0 +1,23 @@
+{
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "type": "node",
+      "request": "launch",
+      "name": "Debug Vitest (current file)",
+      "program": "${workspaceFolder}/node_modules/vitest/vitest.mjs",
+      "cwd": "${workspaceFolder}",
+      "stopOnEntry": false,
+      "runtimeArgs": ["--inspect"],
+      "args": [
+        "run",
+        "${file}",
+        "--no-file-parallelism",
+        "--test-timeout=100000"
+      ],
+      "console": "integratedTerminal",
+      "autoAttachChildProcesses": true,
+      "skipFiles": ["<node_internals>/**"]
+    }
+  ]
+}

@@ -4,6 +4,14 @@ import type { IdempotencyKeyRepository } from "@/domain/repositories/idempotency
 export class InMemoryIdempotencyKeyRepository implements IdempotencyKeyRepository {
   public idempotencyKeys: IdempotencyKey[] = [];
 
+  snapshot() {
+    return [...this.idempotencyKeys];
+  }
+
+  restore(s: IdempotencyKey[]) {
+    this.idempotencyKeys = [...s];
+  }
+
   async findOne(idempotencyKey: string): Promise<IdempotencyKey | null> {
     return this.idempotencyKeys.find(ik => ik.key === idempotencyKey) ?? null;
   }
