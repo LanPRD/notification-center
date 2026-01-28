@@ -15,7 +15,7 @@ export class IdempotencyKey {
   responseBody: Record<string, unknown> | null;
   responseStatus: number;
 
-  constructor(data: IdempotencyKeyProps) {
+  private constructor(data: IdempotencyKeyProps) {
     this.key = data.key;
     this.expiresAt = data.expiresAt;
     this.createdAt = data.createdAt;

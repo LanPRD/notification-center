@@ -36,8 +36,8 @@ model UserPreference {
 model Notification {
   id           String               @id @default(uuid())
   externalId   String?              @unique
-  user         User?                @relation(fields: [userId], references: [id], onDelete: SetNull)
-  userId       String?
+  user         User                 @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId       String
   templateName String
   content      Json
   priority     NotificationPriority @default(LOW)

@@ -1,3 +1,4 @@
+import { CreateNotificationUseCase } from "@/application/use-cases/notifications/create-notification";
 import { Module } from "@nestjs/common";
 import { DatabaseModule } from "../database/database.module";
 import { CreateNotificationController } from "./controllers/create-notification.controller";
@@ -5,6 +6,7 @@ import { CreateUserController } from "./controllers/create-user.controller";
 
 @Module({
   imports: [DatabaseModule],
-  controllers: [CreateNotificationController, CreateUserController]
+  controllers: [CreateNotificationController, CreateUserController],
+  providers: [CreateNotificationUseCase]
 })
 export class HttpModule {}

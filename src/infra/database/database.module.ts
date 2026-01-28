@@ -1,4 +1,8 @@
+import { IdempotencyKeyRepository } from "@/domain/repositories/idempotency-key-repository";
+import { NotificationRepository } from "@/domain/repositories/notification-repository";
+import { UnitOfWork } from "@/domain/repositories/unit-of-work";
 import { Module } from "@nestjs/common";
+import { EnvModule } from "../env/env.module";
 import { PrismaUnitOfWorkService } from "./prisma/prisma-unit-of-work.service";
 import { PrismaService } from "./prisma/prisma.service";
 import { PrismaIdempotencyKeyRepository } from "./repositories/prisma-idempotency-key-repository";
@@ -7,19 +11,29 @@ import { PrismaUserPreferenceRepository } from "./repositories/prisma-user-prefe
 import { PrismaUserRepository } from "./repositories/prisma-user-repository";
 
 @Module({
+  imports: [EnvModule],
   providers: [
     PrismaService,
-    PrismaUnitOfWorkService,
-    PrismaIdempotencyKeyRepository,
-    PrismaNotificationRepository,
+    {
+      provide: UnitOfWork,
+      useClass: PrismaUnitOfWorkService
+    },
+    {
+      provide: IdempotencyKeyRepository,
+      useClass: PrismaIdempotencyKeyRepository
+    },
+    {
+      provide: NotificationRepository,
+      useClass: PrismaNotificationRepository
+    },
     PrismaUserPreferenceRepository,
     PrismaUserRepository
   ],
   exports: [
     PrismaService,
-    PrismaUnitOfWorkService,
-    PrismaIdempotencyKeyRepository,
-    PrismaNotificationRepository,
+    UnitOfWork,
+    IdempotencyKeyRepository,
+    NotificationRepository,
     PrismaUserPreferenceRepository,
     PrismaUserRepository
   ]

@@ -12,9 +12,10 @@ export class InMemoryNotificationRepository implements NotificationRepository {
     this.notifications = [...s];
   }
 
-  async findOne(externalId: string): Promise<Notification | null> {
+  async findByExternalId(externalId: string): Promise<Notification | null> {
     return this.notifications.find(n => n.externalId === externalId) ?? null;
   }
+
   async create(notification: Notification): Promise<void> {
     this.notifications.push(notification);
   }

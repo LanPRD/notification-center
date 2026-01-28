@@ -1,7 +1,7 @@
 import type { ValidationErrorResponseDto } from "@/infra/http/dtos/error-response.dto";
-import { ConflictException as ConflictNest } from "@nestjs/common";
+import { BadRequestException as BadRequestNest } from "@nestjs/common";
 
-export class ConflictException extends ConflictNest {
+export class BadRequestException extends BadRequestNest {
   constructor(objectOrError: ValidationErrorResponseDto) {
     super(objectOrError);
   }

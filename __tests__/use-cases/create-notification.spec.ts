@@ -1,5 +1,7 @@
 import { ConflictException } from "@/application/errors/conflict-exception";
 import { CreateNotificationUseCase } from "@/application/use-cases/notifications/create-notification";
+import { UniqueEntityID } from "@/core/entities/unique-entity-id";
+import { IdempotencyKey } from "@/domain/entities/idempotency-key";
 import { InMemoryIdempotencyKeyRepository } from "__tests__/repositories/in-memory-idempotency-key-repository";
 import { InMemoryNotificationRepository } from "__tests__/repositories/in-memory-notification-repository";
 import { InMemoryUnitOfWork } from "__tests__/repositories/in-memory-unit-of-work";
@@ -26,14 +28,16 @@ describe("Create Notification", () => {
   });
 
   test("it should throw an error when idempotency key already exists", async () => {
-    const idempotencyKeyHash = "existing-key";
+    const idempotencyKeyHash = new UniqueEntityID();
 
-    await idempotencyKeyRepository.create({
-      key: idempotencyKeyHash,
+    const ik = IdempotencyKey.create({
+      key: idempotencyKeyHash.toString(),
       expiresAt: new Date(),
       responseBody: {},
       responseStatus: 201
     });
+
+    await idempotencyKeyRepository.create(ik);
 
     const content = {
       title: "New notification",
@@ -41,10 +45,14 @@ describe("Create Notification", () => {
     };
 
     const result = await sut.execute({
-      content,
-      userId: "user123",
-      idempotencyKeyHash: idempotencyKeyHash,
-      externalId: "unique-external-id"
+      input: {
+        content,
+        userId: "user123",
+        externalId: "unique-external-id",
+        priority: "HIGH",
+        templateName: "WELCOME_EMAIL"
+      },
+      rawHeader: { ["idempotency-key"]: idempotencyKeyHash.toString() }
     });
 
     expect(result.isLeft()).toBe(true);
@@ -59,19 +67,23 @@ describe("Create Notification", () => {
       body: "This is a test notification."
     };
 
-    const idempotencyKeyHash = "unique-key";
+    const idempotencyKeyHash = new UniqueEntityID();
 
     const result = await sut.execute({
-      content,
-      userId: "user123",
-      idempotencyKeyHash,
-      externalId: "unique-external-id"
+      input: {
+        content,
+        userId: "user123",
+        externalId: "unique-external-id",
+        priority: "HIGH",
+        templateName: "WELCOME_EMAIL"
+      },
+      rawHeader: { ["idempotency-key"]: idempotencyKeyHash.toString() }
     });
 
     expect(result.isRight()).toBe(true);
     expect(notificationRepository.notifications[0].content).toEqual(content);
     expect(idempotencyKeyRepository.idempotencyKeys[0].key).toBe(
-      idempotencyKeyHash
+      idempotencyKeyHash.toString()
     );
   });
 
@@ -90,10 +102,14 @@ describe("Create Notification", () => {
 
     await expect(
       sut.execute({
-        content: { title: "t", body: "b" },
-        userId: "user123",
-        idempotencyKeyHash: "k-rollback",
-        externalId: "ext-rollback"
+        input: {
+          content: { title: "t", body: "b" },
+          userId: "user123",
+          externalId: "ext-rollback",
+          priority: "HIGH",
+          templateName: "WELCOME_EMAIL"
+        },
+        rawHeader: { ["idempotency-key"]: new UniqueEntityID().toString() }
       })
     ).rejects.toThrow("notification create failed");
 

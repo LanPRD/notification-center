@@ -5,7 +5,7 @@ import type { Optional } from "@/core/types/optional";
 interface NotificationProps {
   content: any;
   userId: UniqueEntityID;
-  externalId: string;
+  externalId: string | null;
   templateName: string;
   priority: "LOW" | "MEDIUM" | "HIGH";
   status: "PENDING" | "SENT" | "PARTIAL" | "FAILED" | "CANCELED";
@@ -17,7 +17,7 @@ export class Notification extends Entity<NotificationProps> {
     return this.props.content;
   }
 
-  public get externalId(): string {
+  public get externalId(): string | null {
     return this.props.externalId;
   }
 
@@ -33,12 +33,12 @@ export class Notification extends Entity<NotificationProps> {
     return this.props.templateName;
   }
 
-  public get priority(): string {
+  public get priority(): "LOW" | "MEDIUM" | "HIGH" {
     return this.props.priority;
   }
 
-  public get status(): string {
-    return this.props.status.toString();
+  public get status(): "PENDING" | "SENT" | "PARTIAL" | "FAILED" | "CANCELED" {
+    return this.props.status;
   }
 
   static create(

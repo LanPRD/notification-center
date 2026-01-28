@@ -12,9 +12,10 @@ export class InMemoryIdempotencyKeyRepository implements IdempotencyKeyRepositor
     this.idempotencyKeys = [...s];
   }
 
-  async findOne(idempotencyKey: string): Promise<IdempotencyKey | null> {
+  async findByKey(idempotencyKey: string): Promise<IdempotencyKey | null> {
     return this.idempotencyKeys.find(ik => ik.key === idempotencyKey) ?? null;
   }
+
   async create(idempotencyKey: IdempotencyKey): Promise<void> {
     this.idempotencyKeys.push(idempotencyKey);
   }

@@ -1,0 +1,37 @@
+import { UniqueEntityID } from "@/core/entities/unique-entity-id";
+import { Notification } from "@/domain/entities/notification";
+import type {
+  Prisma,
+  Notification as PrismaNotification
+} from "@prisma/client";
+
+export class PrismaNotificationMapper {
+  static toDomain(raw: PrismaNotification): Notification {
+    return Notification.create(
+      {
+        content: raw.content,
+        externalId: raw.externalId,
+        userId: new UniqueEntityID(raw.userId),
+        createdAt: raw.createdAt,
+        templateName: raw.templateName,
+        priority: raw.priority,
+        status: raw.status
+      },
+      new UniqueEntityID(raw.id)
+    );
+  }
+
+  static toPrisma(
+    notification: Notification
+  ): Prisma.NotificationUncheckedCreateInput {
+    return {
+      content: notification.content,
+      externalId: notification.externalId,
+      templateName: notification.templateName,
+      priority: notification.priority,
+      status: notification.status,
+      createdAt: notification.createdAt,
+      userId: notification.userId.toString()
+    };
+  }
+}

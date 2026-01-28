@@ -1,3 +1,3 @@
-export interface UnitOfWork<TTx = unknown> {
-  run<T>(fn: (tx: TTx) => Promise<T>): Promise<T>;
+export abstract class UnitOfWork<TTx = unknown> {
+  abstract run<T>(fn: (tx: TTx) => Promise<T>): Promise<T>;
 }
