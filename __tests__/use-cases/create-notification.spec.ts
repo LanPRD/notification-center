@@ -2,6 +2,8 @@ import { ConflictException } from "@/application/errors/conflict-exception";
 import { CreateNotificationUseCase } from "@/application/use-cases/notifications/create-notification";
 import { UniqueEntityID } from "@/core/entities/unique-entity-id";
 import { IdempotencyKey } from "@/domain/entities/idempotency-key";
+import { Notification } from "@/domain/entities/notification";
+import { BadRequestException } from "@nestjs/common";
 import { InMemoryIdempotencyKeyRepository } from "__tests__/repositories/in-memory-idempotency-key-repository";
 import { InMemoryNotificationRepository } from "__tests__/repositories/in-memory-notification-repository";
 import { InMemoryUnitOfWork } from "__tests__/repositories/in-memory-unit-of-work";
@@ -115,6 +117,83 @@ describe("Create Notification", () => {
 
     expect(idempotencyKeyRepository.idempotencyKeys).toHaveLength(0);
     expect(notificationRepository.notifications).toHaveLength(0);
+  });
+
+  test("it should throw an error if idempotency key isn't a valid UUID", async () => {
+    const content = {
+      title: "New notification",
+      body: "This is a test notification."
+    };
+
+    const result = await sut.execute({
+      input: {
+        content,
+        userId: "user123",
+        externalId: "unique-external-id",
+        priority: "HIGH",
+        templateName: "WELCOME_EMAIL"
+      },
+      rawHeader: { ["idempotency-key"]: "invalid-idempotency-key" }
+    });
+
+    expect(result.isLeft()).toBe(true);
+    expect(result.value).toBeInstanceOf(BadRequestException);
+  });
+
+  test("it should throw an error if externalId is missing", async () => {
+    const content = {
+      title: "New notification",
+      body: "This is a test notification."
+    };
+
+    const result = await sut.execute({
+      input: {
+        content,
+        userId: "user123",
+        externalId: "",
+        priority: "HIGH",
+        templateName: "WELCOME_EMAIL"
+      },
+      rawHeader: { ["idempotency-key"]: new UniqueEntityID().toString() }
+    });
+
+    expect(result.isLeft()).toBe(true);
+    expect(result.value).toBeInstanceOf(BadRequestException);
+  });
+
+  test("it should thrown an error if already a notification with the same externalId exists", async () => {
+    const content = {
+      title: "New notification",
+      body: "This is a test notification."
+    };
+
+    const externalId = "duplicate-external-id";
+    const userId = new UniqueEntityID();
+
+    const notification = Notification.create({
+      content,
+      userId,
+      externalId,
+      priority: "HIGH",
+      templateName: "WELCOME_EMAIL",
+      status: "PENDING"
+    });
+
+    await notificationRepository.create(notification);
+
+    const result = await sut.execute({
+      input: {
+        content,
+        userId: userId.toString(),
+        externalId,
+        priority: "HIGH",
+        templateName: "WELCOME_EMAIL"
+      },
+      rawHeader: { ["idempotency-key"]: new UniqueEntityID().toString() }
+    });
+
+    expect(result.isLeft()).toBe(true);
+    expect(result.value).toBeInstanceOf(ConflictException);
   });
 
   class FailingNotificationRepository extends InMemoryNotificationRepository {

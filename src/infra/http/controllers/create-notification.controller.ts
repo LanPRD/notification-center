@@ -25,7 +25,7 @@ export class CreateNotificationController {
 
     if (result.isLeft()) {
       console.log(result.value);
-      throw new Error();
+      throw result.value;
     }
 
     return result.value.notification;

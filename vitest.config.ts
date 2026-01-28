@@ -11,7 +11,14 @@ export default defineConfig({
       provider: "v8",
       reporter: ["text", "html"],
       include: ["**/*.ts"],
-      exclude: ["**/__tests__/**", "**/*.spec.ts"]
+      exclude: [
+        "**/__tests__/**",
+        "**/*.spec.ts",
+        "/dist/**",
+        "*.config.*ts",
+        "/scripts/**",
+        "/node_modules/**"
+      ]
     }
   },
   plugins: [

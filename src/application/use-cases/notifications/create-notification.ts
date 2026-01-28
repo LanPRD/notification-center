@@ -47,10 +47,12 @@ export class CreateNotificationUseCase {
     } = idempotencyKeySchema.safeParse(rawHeader);
 
     if (!success) {
-      throw new BadRequestException({
-        message: "Validation failed",
-        issues: z.treeifyError(error)
-      });
+      return left(
+        new BadRequestException({
+          message: "Validation failed",
+          issues: z.treeifyError(error)
+        })
+      );
     }
 
     const ik = data["idempotency-key"];
@@ -65,9 +67,11 @@ export class CreateNotificationUseCase {
     }
 
     if (!externalId) {
-      throw new BadRequestException({
-        message: "External ID is required."
-      });
+      return left(
+        new BadRequestException({
+          message: "External ID is required."
+        })
+      );
     }
 
     if (await this.notificationRepository.findByExternalId(externalId)) {
