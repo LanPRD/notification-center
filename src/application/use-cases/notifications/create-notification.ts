@@ -1,5 +1,6 @@
 import { BadRequestException } from "@/application/errors/bad-request-exception";
 import { ConflictException } from "@/application/errors/conflict-exception";
+import { NotFoundException } from "@/application/errors/not-found-exception";
 import { left, right, type Either } from "@/core/either";
 import { UniqueEntityID } from "@/core/entities/unique-entity-id";
 import { IdempotencyKey } from "@/domain/entities/idempotency-key";
@@ -7,6 +8,7 @@ import { Notification } from "@/domain/entities/notification";
 import { IdempotencyKeyRepository } from "@/domain/repositories/idempotency-key-repository";
 import { NotificationRepository } from "@/domain/repositories/notification-repository";
 import { UnitOfWork } from "@/domain/repositories/unit-of-work";
+import { UserRepository } from "@/domain/repositories/user-repository";
 import {
   idempotencyKeySchema,
   type CreateNotificationDto
@@ -32,6 +34,7 @@ export class CreateNotificationUseCase {
   constructor(
     private readonly idempotencyKeyRepository: IdempotencyKeyRepository,
     private readonly notificationRepository: NotificationRepository,
+    private readonly userRepository: UserRepository,
     private readonly unitOfWork: UnitOfWork
   ) {}
 
@@ -78,6 +81,16 @@ export class CreateNotificationUseCase {
       return left(
         new ConflictException({
           message: "Notification with this external ID already exists."
+        })
+      );
+    }
+
+    const userExists = await this.userRepository.findById(userId);
+
+    if (!userExists) {
+      return left(
+        new NotFoundException({
+          message: "User not found."
         })
       );
     }

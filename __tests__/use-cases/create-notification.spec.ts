@@ -1,15 +1,19 @@
 import { ConflictException } from "@/application/errors/conflict-exception";
+import { NotFoundException } from "@/application/errors/not-found-exception";
 import { CreateNotificationUseCase } from "@/application/use-cases/notifications/create-notification";
 import { UniqueEntityID } from "@/core/entities/unique-entity-id";
 import { IdempotencyKey } from "@/domain/entities/idempotency-key";
 import { Notification } from "@/domain/entities/notification";
 import { BadRequestException } from "@nestjs/common";
+import { userBuild } from "__tests__/factories/user-builder";
 import { InMemoryIdempotencyKeyRepository } from "__tests__/repositories/in-memory-idempotency-key-repository";
 import { InMemoryNotificationRepository } from "__tests__/repositories/in-memory-notification-repository";
 import { InMemoryUnitOfWork } from "__tests__/repositories/in-memory-unit-of-work";
+import { InMemoryUserRepository } from "__tests__/repositories/in-memory-user-repository";
 
 let idempotencyKeyRepository: InMemoryIdempotencyKeyRepository;
 let notificationRepository: InMemoryNotificationRepository;
+let userRepository: InMemoryUserRepository;
 let unitOfWork: InMemoryUnitOfWork;
 let sut: CreateNotificationUseCase;
 
@@ -17,6 +21,7 @@ describe("Create Notification", () => {
   beforeEach(() => {
     idempotencyKeyRepository = new InMemoryIdempotencyKeyRepository();
     notificationRepository = new InMemoryNotificationRepository();
+    userRepository = new InMemoryUserRepository();
     unitOfWork = new InMemoryUnitOfWork([
       idempotencyKeyRepository,
       notificationRepository
@@ -25,6 +30,7 @@ describe("Create Notification", () => {
     sut = new CreateNotificationUseCase(
       idempotencyKeyRepository,
       notificationRepository,
+      userRepository,
       unitOfWork
     );
   });
@@ -68,13 +74,15 @@ describe("Create Notification", () => {
       title: "New notification",
       body: "This is a test notification."
     };
-
     const idempotencyKeyHash = new UniqueEntityID();
+    const user = userBuild();
+
+    await userRepository.create(user);
 
     const result = await sut.execute({
       input: {
         content,
-        userId: "user123",
+        userId: user.id.toString(),
         externalId: "unique-external-id",
         priority: "HIGH",
         templateName: "WELCOME_EMAIL"
@@ -90,6 +98,9 @@ describe("Create Notification", () => {
   });
 
   test("it should rollback when notification creation fails (atomicity)", async () => {
+    const user = userBuild();
+    await userRepository.create(user);
+
     notificationRepository = new FailingNotificationRepository();
     unitOfWork = new InMemoryUnitOfWork([
       idempotencyKeyRepository,
@@ -99,6 +110,7 @@ describe("Create Notification", () => {
     sut = new CreateNotificationUseCase(
       idempotencyKeyRepository,
       notificationRepository,
+      userRepository,
       unitOfWork
     );
 
@@ -106,7 +118,7 @@ describe("Create Notification", () => {
       sut.execute({
         input: {
           content: { title: "t", body: "b" },
-          userId: "user123",
+          userId: user.id.toString(),
           externalId: "ext-rollback",
           priority: "HIGH",
           templateName: "WELCOME_EMAIL"
@@ -194,6 +206,30 @@ describe("Create Notification", () => {
 
     expect(result.isLeft()).toBe(true);
     expect(result.value).toBeInstanceOf(ConflictException);
+  });
+
+  test("it should not be able to create a notification if user doesn't exist", async () => {
+    const content = {
+      title: "New notification",
+      body: "This is a test notification."
+    };
+
+    const idempotencyKeyHash = new UniqueEntityID();
+
+    const result = await sut.execute({
+      input: {
+        content,
+        userId: "user123",
+        externalId: "unique-external-id",
+        priority: "HIGH",
+        templateName: "WELCOME_EMAIL"
+      },
+      rawHeader: { ["idempotency-key"]: idempotencyKeyHash.toString() }
+    });
+
+    expect(result.isLeft()).toBe(true);
+    expect(result.value).toBeInstanceOf(NotFoundException);
+    expect(idempotencyKeyRepository.idempotencyKeys).toHaveLength(0);
   });
 
   class FailingNotificationRepository extends InMemoryNotificationRepository {
