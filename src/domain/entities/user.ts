@@ -3,8 +3,8 @@ import type { UniqueEntityID } from "@/core/entities/unique-entity-id";
 
 interface UserProps {
   email: string;
-  phoneNumber?: string;
-  pushToken?: string;
+  phoneNumber?: string | null;
+  pushToken?: string | null;
 }
 
 export class User extends Entity<UserProps> {
@@ -12,19 +12,19 @@ export class User extends Entity<UserProps> {
     return this.props.email;
   }
 
-  public get phoneNumber(): string | undefined {
-    return this.props.phoneNumber;
+  public get phoneNumber(): string | null {
+    return this.props.phoneNumber ?? null;
   }
 
-  public set phoneNumber(phoneNumber: string | undefined) {
+  public set phoneNumber(phoneNumber: string | null) {
     this.props.phoneNumber = phoneNumber;
   }
 
-  public get pushToken(): string | undefined {
-    return this.props.pushToken;
+  public get pushToken(): string | null {
+    return this.props.pushToken ?? null;
   }
 
-  public set pushToken(pushToken: string | undefined) {
+  public set pushToken(pushToken: string | null) {
     this.props.pushToken = pushToken;
   }
 

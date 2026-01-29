@@ -14,14 +14,12 @@ import {
   ApiTags
 } from "@nestjs/swagger";
 import { ZodValidationPipe } from "nestjs-zod";
-import { ApiStandardResponses } from "../decorators/api-standard-responses.decorator";
 import { CreateUserDto, createUserSchema } from "../dtos/create-user.dto";
-import { ErrorResponseDto } from "../dtos/error-response.dto";
+import { BaseErrorResponseDto } from "../dtos/error-response.dto";
 import { UserResponseDto } from "../dtos/user-response.dto";
 
 @Controller("/users")
 @ApiTags("Users")
-@ApiStandardResponses()
 export class CreateUserController {
   constructor(private readonly prisma: PrismaService) {}
 
@@ -29,7 +27,7 @@ export class CreateUserController {
   @HttpCode(201)
   @ApiBody({ type: CreateUserDto })
   @ApiCreatedResponse({ type: UserResponseDto })
-  @ApiConflictResponse({ type: ErrorResponseDto })
+  @ApiConflictResponse({ type: BaseErrorResponseDto })
   @UsePipes(new ZodValidationPipe(createUserSchema))
   async handle(@Body() body: CreateUserDto): Promise<UserResponseDto> {
     const userAlreadyExist = await this.checkUserAlreadyExists(body.email);

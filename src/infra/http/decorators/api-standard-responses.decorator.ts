@@ -1,16 +1,7 @@
 import { applyDecorators } from "@nestjs/common";
-import {
-  ApiBadRequestResponse,
-  ApiInternalServerErrorResponse
-} from "@nestjs/swagger";
-import {
-  ErrorResponseDto,
-  ValidationErrorResponseDto
-} from "../dtos/error-response.dto";
 
 export function ApiStandardResponses() {
-  return applyDecorators(
-    ApiBadRequestResponse({ type: ValidationErrorResponseDto }),
-    ApiInternalServerErrorResponse({ type: ErrorResponseDto })
-  );
+  return applyDecorators();
+  // ApiBadRequestResponse({ type: ValidationErrorResponseDto }),
+  // ApiInternalServerErrorResponse({ type: ErrorResponseDto })
 }
