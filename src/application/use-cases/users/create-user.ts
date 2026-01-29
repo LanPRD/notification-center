@@ -1,32 +1,44 @@
-import { BadRequestException } from "@/application/errors/bad-request-exception";
 import { ConflictException } from "@/application/errors/conflict-exception";
-import { type Either } from "@/core/either";
-import { Notification } from "@/domain/entities/notification";
-import { NotificationRepository } from "@/domain/repositories/notification-repository";
-import { type CreateNotificationDto } from "@/infra/http/dtos/create-notification.dto";
+import { left, right, type Either } from "@/core/either";
+import { User } from "@/domain/entities/user";
+import { UserRepository } from "@/domain/repositories/user-repository";
+import type { CreateUserDto } from "@/infra/http/dtos/create-user.dto";
 import { Injectable } from "@nestjs/common";
 
 interface CreateUserInput {
-  input: CreateNotificationDto;
-  rawHeader: any;
+  input: CreateUserDto;
 }
 
 type CreateUserUseCaseResponse = Either<
-  BadRequestException | ConflictException,
+  ConflictException,
   {
-    notification: Notification;
+    user: User;
   }
 >;
 
 @Injectable()
 export class CreateUserUseCase {
-  constructor(
-    private readonly notificationRepository: NotificationRepository
-  ) {}
+  constructor(private readonly userRepository: UserRepository) {}
 
   public async execute({
     input
   }: CreateUserInput): Promise<CreateUserUseCaseResponse> {
-    return {} as CreateUserUseCaseResponse;
+    const { email, phoneNumber, pushToken } = input;
+
+    const existingUser = await this.userRepository.findByEmail(email);
+
+    if (existingUser) {
+      return left(
+        new ConflictException({
+          message: "User with the same email already exists."
+        })
+      );
+    }
+
+    const user = User.create({ email, phoneNumber, pushToken });
+
+    await this.userRepository.create(user);
+
+    return right({ user });
   }
 }
