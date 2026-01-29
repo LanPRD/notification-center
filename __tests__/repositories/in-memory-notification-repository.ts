@@ -19,4 +19,8 @@ export class InMemoryNotificationRepository implements NotificationRepository {
   async create(notification: Notification): Promise<void> {
     this.notifications.push(notification);
   }
+
+  async findById(id: string): Promise<Notification | null> {
+    return this.notifications.find(n => n.id.toString() === id) ?? null;
+  }
 }

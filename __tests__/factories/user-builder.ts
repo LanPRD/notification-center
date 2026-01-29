@@ -2,7 +2,7 @@ import { UniqueEntityID } from "@/core/entities/unique-entity-id";
 import { User } from "@/domain/entities/user";
 import { faker } from "@faker-js/faker";
 
-export function userBuild(id?: UniqueEntityID) {
+export function userBuilder(id?: UniqueEntityID) {
   return User.create(
     {
       email: faker.internet.email(),

@@ -5,7 +5,7 @@ import { UniqueEntityID } from "@/core/entities/unique-entity-id";
 import { IdempotencyKey } from "@/domain/entities/idempotency-key";
 import { Notification } from "@/domain/entities/notification";
 import { BadRequestException } from "@nestjs/common";
-import { userBuild } from "__tests__/factories/user-builder";
+import { userBuilder } from "__tests__/factories/user-builder";
 import { InMemoryIdempotencyKeyRepository } from "__tests__/repositories/in-memory-idempotency-key-repository";
 import { InMemoryNotificationRepository } from "__tests__/repositories/in-memory-notification-repository";
 import { InMemoryUnitOfWork } from "__tests__/repositories/in-memory-unit-of-work";
@@ -75,7 +75,7 @@ describe("Create Notification", () => {
       body: "This is a test notification."
     };
     const idempotencyKeyHash = new UniqueEntityID();
-    const user = userBuild();
+    const user = userBuilder();
 
     await userRepository.create(user);
 
@@ -98,7 +98,7 @@ describe("Create Notification", () => {
   });
 
   test("it should rollback when notification creation fails (atomicity)", async () => {
-    const user = userBuild();
+    const user = userBuilder();
     await userRepository.create(user);
 
     notificationRepository = new FailingNotificationRepository();

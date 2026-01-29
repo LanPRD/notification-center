@@ -8,6 +8,15 @@ import { PrismaService } from "../prisma/prisma.service";
 @Injectable()
 export class PrismaNotificationRepository implements NotificationRepository {
   constructor(private readonly prisma: PrismaService) {}
+  async findById(id: string): Promise<Notification | null> {
+    const notification = await this.prisma.notification.findUnique({
+      where: { id: id }
+    });
+
+    if (!notification) return null;
+
+    return PrismaNotificationMapper.toDomain(notification);
+  }
 
   async findByExternalId(externalId: string): Promise<Notification | null> {
     const notification = await this.prisma.notification.findUnique({
