@@ -41,6 +41,12 @@ export class Notification extends Entity<NotificationProps> {
     return this.props.status;
   }
 
+  public set status(
+    status: "PENDING" | "SENT" | "PARTIAL" | "FAILED" | "CANCELED"
+  ) {
+    this.props.status = status;
+  }
+
   static create(
     props: Optional<NotificationProps, "createdAt">,
     id?: UniqueEntityID

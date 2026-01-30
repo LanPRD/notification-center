@@ -2,7 +2,10 @@ import { UniqueEntityID } from "@/core/entities/unique-entity-id";
 import { Notification } from "@/domain/entities/notification";
 import { faker } from "@faker-js/faker";
 
-export function notificationBuilder(id?: UniqueEntityID) {
+export function notificationBuilder(
+  overrides: Partial<Notification> = {},
+  id?: UniqueEntityID
+) {
   return Notification.create(
     {
       content: faker.lorem.sentence(),
@@ -10,6 +13,7 @@ export function notificationBuilder(id?: UniqueEntityID) {
       status: "PENDING",
       priority: "MEDIUM",
       templateName: faker.lorem.word(),
+      ...overrides,
       userId: new UniqueEntityID()
     },
     id ?? new UniqueEntityID()
