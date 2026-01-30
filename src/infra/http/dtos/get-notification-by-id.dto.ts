@@ -40,3 +40,7 @@ export type GetNotificationResponse = Prisma.NotificationGetPayload<{
 export class GetNotificationResponseDto extends createZodDto(
   notificationWithLogsAndUserSchema
 ) {}
+
+export class CancelNotificationResponseDto extends createZodDto(
+  notificationWithLogsAndUserSchema
+) {}

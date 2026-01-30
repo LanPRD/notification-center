@@ -1,10 +1,6 @@
 import { GetNotificationByIdUseCase } from "@/application/use-cases/notifications/get-notification-by-id";
 import { Controller, Get, HttpCode, Param, UsePipes } from "@nestjs/common";
-import {
-  ApiCreatedResponse,
-  ApiNotFoundResponse,
-  ApiTags
-} from "@nestjs/swagger";
+import { ApiNotFoundResponse, ApiOkResponse, ApiTags } from "@nestjs/swagger";
 import { ZodValidationPipe } from "nestjs-zod";
 import { BaseErrorResponseDto } from "../dtos/error-response.dto";
 import {
@@ -19,7 +15,7 @@ export class GetNotificationByIdController {
 
   @Get("/notifications/:id")
   @HttpCode(200)
-  @ApiCreatedResponse({ type: GetNotificationResponseDto })
+  @ApiOkResponse({ type: GetNotificationResponseDto })
   @ApiNotFoundResponse({ type: BaseErrorResponseDto })
   @UsePipes(new ZodValidationPipe(getNotificationByIdSchema))
   async handle(@Param("id") id: string) {

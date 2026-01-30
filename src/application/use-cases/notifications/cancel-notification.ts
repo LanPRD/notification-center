@@ -5,7 +5,7 @@ import { NotificationRepository } from "@/domain/repositories/notification-repos
 import { Injectable } from "@nestjs/common";
 
 type CancelNotificationUseCaseResponse = Either<
-  NotFoundException,
+  NotFoundException | ConflictException,
   {
     id: string;
     status: "CANCELED";
