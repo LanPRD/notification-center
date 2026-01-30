@@ -1,6 +1,7 @@
 import { IdempotencyKeyRepository } from "@/domain/repositories/idempotency-key-repository";
 import { NotificationRepository } from "@/domain/repositories/notification-repository";
 import { UnitOfWork } from "@/domain/repositories/unit-of-work";
+import { UserRepository } from "@/domain/repositories/user-repository";
 import { Module } from "@nestjs/common";
 import { EnvModule } from "../env/env.module";
 import { PrismaUnitOfWorkService } from "./prisma/prisma-unit-of-work.service";
@@ -27,7 +28,10 @@ import { PrismaUserRepository } from "./repositories/prisma-user-repository";
       useClass: PrismaNotificationRepository
     },
     PrismaUserPreferenceRepository,
-    PrismaUserRepository
+    {
+      provide: UserRepository,
+      useClass: PrismaUserRepository
+    }
   ],
   exports: [
     PrismaService,
@@ -35,7 +39,7 @@ import { PrismaUserRepository } from "./repositories/prisma-user-repository";
     IdempotencyKeyRepository,
     NotificationRepository,
     PrismaUserPreferenceRepository,
-    PrismaUserRepository
+    UserRepository
   ]
 })
 export class DatabaseModule {}
