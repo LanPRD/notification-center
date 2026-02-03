@@ -5,6 +5,7 @@ import { UniqueEntityID } from "@/core/entities/unique-entity-id";
 import { IdempotencyKey } from "@/domain/entities/idempotency-key";
 import { Notification } from "@/domain/entities/notification";
 import { BadRequestException } from "@nestjs/common";
+import { IkFactory } from "__tests__/factories/ik-builder";
 import { UserFactory } from "__tests__/factories/user-builder";
 import { InMemoryIdempotencyKeyRepository } from "__tests__/repositories/in-memory-idempotency-key-repository";
 import { InMemoryNotificationRepository } from "__tests__/repositories/in-memory-notification-repository";
@@ -177,6 +178,52 @@ describe("Create Notification", () => {
     expect(result.value).toBeInstanceOf(BadRequestException);
   });
 
+  test("it should return cached response status if already a notification with the same idempotency key", async () => {
+    const externalId = "duplicate-external-id";
+
+    const user = UserFactory.build();
+    const userCreated = await userRepository.create(user);
+
+    const content = {
+      title: "New notification",
+      body: "This is a test notification."
+    };
+
+    const notification = Notification.create({
+      content,
+      userId: userCreated.id,
+      externalId,
+      priority: "HIGH",
+      templateName: "WELCOME_EMAIL",
+      status: "PENDING"
+    });
+
+    await notificationRepository.create(notification);
+
+    const fakeIk = new UniqueEntityID().toString();
+    const ik = IkFactory.build(fakeIk);
+    ik.responseStatus = 201;
+    ik.responseBody = notification;
+
+    await idempotencyKeyRepository.create(ik);
+
+    const result = await sut.execute({
+      input: {
+        content,
+        userId: userCreated.id.toString(),
+        externalId,
+        priority: "HIGH",
+        templateName: "WELCOME_EMAIL"
+      },
+      rawHeader: { ["idempotency-key"]: fakeIk }
+    });
+
+    expect(result.isRight()).toBe(true);
+    expect(notificationRepository.notifications[0].id).toEqual(notification.id);
+    expect(idempotencyKeyRepository.idempotencyKeys).toHaveLength(1);
+    expect(notificationRepository.notifications).toHaveLength(1);
+  });
+
   test("it should not be able to create a notification if user doesn't exist", async () => {
     const content = {
       title: "New notification",
@@ -199,6 +246,45 @@ describe("Create Notification", () => {
     expect(result.isLeft()).toBe(true);
     expect(result.value).toBeInstanceOf(NotFoundException);
     expect(idempotencyKeyRepository.idempotencyKeys).toHaveLength(0);
+  });
+
+  test("it should return cached notification if it exists", async () => {
+    const user = UserFactory.build();
+    const userCreated = await userRepository.create(user);
+
+    await userRepository.create(user);
+
+    const content = {
+      title: "New notification",
+      body: "This is a test notification."
+    };
+
+    const notification = Notification.create({
+      content,
+      userId: userCreated.id,
+      externalId: "duplicate-external-id",
+      priority: "HIGH",
+      templateName: "WELCOME_EMAIL",
+      status: "PENDING"
+    });
+
+    await notificationRepository.create(notification);
+
+    const result = await sut.execute({
+      input: {
+        content,
+        userId: userCreated.id.toString(),
+        externalId: "duplicate-external-id",
+        priority: "HIGH",
+        templateName: "WELCOME_EMAIL"
+      },
+      rawHeader: { ["idempotency-key"]: new UniqueEntityID().toString() }
+    });
+
+    expect(result.isRight()).toBe(true);
+    expect(notificationRepository.notifications[0].id).toEqual(notification.id);
+    expect(idempotencyKeyRepository.idempotencyKeys).toHaveLength(1);
+    expect(notificationRepository.notifications).toHaveLength(1);
   });
 
   class FailingNotificationRepository extends InMemoryNotificationRepository {

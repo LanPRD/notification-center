@@ -1,7 +1,7 @@
 import { NotFoundException } from "@/application/errors/not-found-exception";
 import { GetNotificationByIdUseCase } from "@/application/use-cases/notifications/get-notification-by-id";
 import { UniqueEntityID } from "@/core/entities/unique-entity-id";
-import { notificationBuilder } from "__tests__/factories/user-builder copy";
+import { NotificationFactory } from "__tests__/factories/notification-builder";
 import { InMemoryNotificationRepository } from "__tests__/repositories/in-memory-notification-repository";
 
 let notificationRepository: InMemoryNotificationRepository;
@@ -14,7 +14,7 @@ describe("Create Notification", () => {
   });
 
   it("should be able to get a notification by id", async () => {
-    const notification = notificationBuilder({}, new UniqueEntityID());
+    const notification = NotificationFactory.build({}, new UniqueEntityID());
 
     await notificationRepository.create(notification);
 

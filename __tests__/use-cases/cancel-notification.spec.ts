@@ -2,7 +2,7 @@ import { ConflictException } from "@/application/errors/conflict-exception";
 import { NotFoundException } from "@/application/errors/not-found-exception";
 import { CancelNotificationUseCase } from "@/application/use-cases/notifications/cancel-notification";
 import { UniqueEntityID } from "@/core/entities/unique-entity-id";
-import { notificationBuilder } from "__tests__/factories/user-builder copy";
+import { NotificationFactory } from "__tests__/factories/notification-builder";
 import { InMemoryNotificationRepository } from "__tests__/repositories/in-memory-notification-repository";
 
 let notificationRepository: InMemoryNotificationRepository;
@@ -15,7 +15,7 @@ describe("Cancel Notification", () => {
   });
 
   it("should cancel a notification", async () => {
-    const notification = notificationBuilder();
+    const notification = NotificationFactory.build();
 
     await notificationRepository.create(notification);
 
@@ -33,7 +33,7 @@ describe("Cancel Notification", () => {
   });
 
   it("should not cancel if notification status isn't PENDING", async () => {
-    const notification = notificationBuilder({ status: "PARTIAL" });
+    const notification = NotificationFactory.build({ status: "PARTIAL" });
 
     await notificationRepository.create(notification);
 
