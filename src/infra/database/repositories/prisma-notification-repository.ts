@@ -1,13 +1,34 @@
 import type { Notification } from "@/domain/entities/notification";
 import type { NotificationRepository } from "@/domain/repositories/notification-repository";
 import { Injectable } from "@nestjs/common";
-import type { Prisma } from "@prisma/client";
+import { Prisma } from "@prisma/client";
 import { PrismaNotificationMapper } from "../mappers/prisma-notification-mapper";
 import { PrismaService } from "../prisma/prisma.service";
 
 @Injectable()
 export class PrismaNotificationRepository implements NotificationRepository {
   constructor(private readonly prisma: PrismaService) {}
+
+  async findByUserAndExternalId(
+    userId: string,
+    externalId: string,
+    tx?: unknown
+  ): Promise<Notification | null> {
+    const db = (tx ?? this.prisma) as Prisma.TransactionClient | PrismaService;
+
+    const notification = await db.notification.findUnique({
+      where: {
+        userId_externalId: {
+          userId: userId,
+          externalId: externalId
+        }
+      }
+    });
+
+    if (!notification) return null;
+
+    return PrismaNotificationMapper.toDomain(notification);
+  }
 
   async update(notification: Notification): Promise<void> {
     await this.prisma.notification.update({
@@ -26,21 +47,16 @@ export class PrismaNotificationRepository implements NotificationRepository {
     return PrismaNotificationMapper.toDomain(notification);
   }
 
-  async findByExternalId(externalId: string): Promise<Notification | null> {
-    const notification = await this.prisma.notification.findUnique({
-      where: { externalId: externalId }
-    });
+  async create(
+    notification: Notification,
+    tx?: Prisma.TransactionClient
+  ): Promise<Notification> {
+    const db = tx ?? this.prisma;
 
-    if (!notification) return null;
-
-    return PrismaNotificationMapper.toDomain(notification);
-  }
-
-  async create(notification: Notification, tx?: unknown): Promise<void> {
-    const db = (tx ?? this.prisma) as Prisma.TransactionClient | PrismaService;
-
-    await db.notification.create({
+    const created = await db.notification.create({
       data: PrismaNotificationMapper.toPrisma(notification)
     });
+
+    return PrismaNotificationMapper.toDomain(created);
   }
 }

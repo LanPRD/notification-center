@@ -21,5 +21,17 @@ export default [
     rules: {
       "no-magic-numbers": ["off"]
     }
+  },
+  {
+    files: ["**/*-repository.ts"],
+    rules: {
+      camelcase: "off"
+    }
+  },
+  {
+    files: ["**/use-cases/**/*.ts"],
+    rules: {
+      complexity: ["error", 10]
+    }
   }
 ];

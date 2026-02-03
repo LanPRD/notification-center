@@ -21,6 +21,7 @@ import {
 } from "@nestjs/swagger";
 import { ZodValidationPipe } from "nestjs-zod";
 import { BaseErrorResponseDto } from "../dtos/error-response.dto";
+import { NotificationPresenter } from "../presenters/notification-presenter";
 
 @Controller("/notifications")
 @ApiTags("Notifications")
@@ -50,6 +51,6 @@ export class CreateNotificationController {
       throw result.value;
     }
 
-    return result.value.notification;
+    return NotificationPresenter.toHTTP(result.value.notification);
   }
 }

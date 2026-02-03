@@ -23,11 +23,13 @@ interface CreateNotificationInput {
 }
 
 type CreateNotificationUseCaseResponse = Either<
-  BadRequestException | ConflictException,
+  BadRequestException | ConflictException | NotFoundException,
   {
     notification: Notification;
   }
 >;
+
+type TxEither = Either<ConflictException, { notification: Notification }>;
 
 @Injectable()
 export class CreateNotificationUseCase {
@@ -43,44 +45,23 @@ export class CreateNotificationUseCase {
     rawHeader
   }: CreateNotificationInput): Promise<CreateNotificationUseCaseResponse> {
     const { content, userId, externalId, priority, templateName } = input;
-    const {
-      success,
-      data,
-      error: error
-    } = idempotencyKeySchema.safeParse(rawHeader);
+    const parsed = idempotencyKeySchema.safeParse(rawHeader);
 
-    if (!success) {
+    if (!parsed.success) {
       return left(
         new BadRequestException({
           message: "Validation failed",
-          issues: z.treeifyError(error)
+          issues: z.treeifyError(parsed.error)
         })
       );
     }
 
-    const ik = data["idempotency-key"];
-
-    if (await this.idempotencyKeyRepository.findByKey(ik)) {
-      return left(
-        new ConflictException({
-          message:
-            "Idempotency key already exists. Please provide a new idempotency key."
-        })
-      );
-    }
+    const ik = parsed.data["idempotency-key"];
 
     if (!externalId) {
       return left(
         new BadRequestException({
           message: "External ID is required."
-        })
-      );
-    }
-
-    if (await this.notificationRepository.findByExternalId(externalId)) {
-      return left(
-        new ConflictException({
-          message: "Notification with this external ID already exists."
         })
       );
     }
@@ -95,15 +76,46 @@ export class CreateNotificationUseCase {
       );
     }
 
-    const result = await this.unitOfWork.run(async tx => {
+    const result = await this.unitOfWork.run<TxEither>(async tx => {
+      const existingIk = await this.idempotencyKeyRepository.findByKey(ik, tx);
+
+      if (existingIk) {
+        if (existingIk.responseStatus) {
+          return right({
+            notification: existingIk.responseBody as unknown as Notification
+          });
+        }
+
+        return left(
+          new ConflictException({
+            message: "Request is being processed, please retry"
+          })
+        );
+      }
+
       const idempotencyKey = IdempotencyKey.create({
         key: ik,
-        expiresAt: addHours(new Date(), 24),
-        responseBody: {},
-        responseStatus: 201
+        expiresAt: addHours(new Date(), 24)
       });
 
       await this.idempotencyKeyRepository.create(idempotencyKey, tx);
+
+      const existingNotification =
+        await this.notificationRepository.findByUserAndExternalId(
+          userId,
+          externalId,
+          tx
+        );
+
+      if (existingNotification) {
+        await this.idempotencyKeyRepository.update(
+          ik,
+          { responseStatus: 201, responseBody: existingNotification },
+          tx
+        );
+
+        return right({ notification: existingNotification });
+      }
 
       const notification = Notification.create({
         content,
@@ -114,11 +126,22 @@ export class CreateNotificationUseCase {
         templateName
       });
 
-      await this.notificationRepository.create(notification, tx);
+      const created = await this.notificationRepository.create(
+        notification,
+        tx
+      );
 
-      return notification;
+      await this.idempotencyKeyRepository.update(
+        ik,
+        { responseStatus: 201, responseBody: created },
+        tx
+      );
+
+      return right({ notification: created });
     });
 
-    return right({ notification: result });
+    if (result.isLeft()) return left(result.value);
+
+    return right({ notification: result.value.notification });
   }
 }

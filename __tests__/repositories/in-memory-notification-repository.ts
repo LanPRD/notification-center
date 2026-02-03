@@ -4,6 +4,17 @@ import type { NotificationRepository } from "@/domain/repositories/notification-
 export class InMemoryNotificationRepository implements NotificationRepository {
   public notifications: Notification[] = [];
 
+  async findByUserAndExternalId(
+    userId: string,
+    externalId: string
+  ): Promise<Notification | null> {
+    return Promise.resolve(
+      this.notifications.find(
+        n => n.externalId === externalId && n.userId === userId
+      ) ?? null
+    );
+  }
+
   snapshot() {
     return [...this.notifications];
   }
@@ -12,12 +23,9 @@ export class InMemoryNotificationRepository implements NotificationRepository {
     this.notifications = [...s];
   }
 
-  async findByExternalId(externalId: string): Promise<Notification | null> {
-    return this.notifications.find(n => n.externalId === externalId) ?? null;
-  }
-
-  async create(notification: Notification): Promise<void> {
+  async create(notification: Notification): Promise<Notification> {
     this.notifications.push(notification);
+    return notification;
   }
 
   async findById(id: string): Promise<Notification | null> {

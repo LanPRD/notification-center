@@ -8,10 +8,12 @@ import { PrismaService } from "../prisma/prisma.service";
 export class PrismaUserRepository implements UserRepository {
   constructor(private readonly prisma: PrismaService) {}
 
-  async create(user: User): Promise<void> {
-    await this.prisma.user.create({
+  async create(user: User): Promise<User> {
+    const prismaUser = await this.prisma.user.create({
       data: PrismaUserMapper.toPrisma(user)
     });
+
+    return PrismaUserMapper.toDomain(prismaUser);
   }
 
   async findById(userId: string): Promise<User | null> {

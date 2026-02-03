@@ -8,10 +8,10 @@ export class PrismaIdempotencyKeyMapper {
   static toDomain(raw: PrismaIdempotencyKey): IdempotencyKey {
     return IdempotencyKey.create({
       key: raw.key,
-      expiresAt: raw.expiresAt,
+      responseStatus: raw.responseStatus,
+      responseBody: raw.responseBody,
       createdAt: raw.createdAt,
-      responseBody: JSON.parse(raw.responseBody as string),
-      responseStatus: raw.responseStatus
+      expiresAt: raw.expiresAt
     });
   }
 

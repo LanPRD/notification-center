@@ -4,53 +4,53 @@ import "dotenv/config";
 import { execSync } from "node:child_process";
 import { randomUUID } from "node:crypto";
 
-// const schemaId = randomUUID();
+const schemaId = randomUUID();
 
-// function generateDatabaseURL(schema: string) {
-//   if (!process.env.DATABASE_URL) {
-//     throw new Error("No database URL provided.");
-//   }
+function generateDatabaseURL(schema: string) {
+  if (!process.env.DATABASE_URL) {
+    throw new Error("No database URL provided.");
+  }
 
-//   const url = new URL(process.env.DATABASE_URL);
-//   url.searchParams.set("schema", schema);
+  const url = new URL(process.env.DATABASE_URL);
+  url.searchParams.set("schema", schema);
 
-//   return url.toString();
-// }
+  return url.toString();
+}
 
-// export let prisma: PrismaClient;
+export let prisma: PrismaClient;
 
-// beforeAll(async () => {
-//   const databaseURL = generateDatabaseURL(schemaId);
+beforeAll(async () => {
+  const databaseURL = generateDatabaseURL(schemaId);
 
-//   process.env.DATABASE_URL = databaseURL;
-//   process.env.DATABASE_SCHEMA = schemaId;
+  process.env.DATABASE_URL = databaseURL;
+  process.env.DATABASE_SCHEMA = schemaId;
 
-//   execSync("npx prisma migrate deploy");
+  execSync("npx prisma migrate deploy");
 
-//   const baseURL = process.env.DATABASE_URL!.split("?")[0];
+  const baseURL = process.env.DATABASE_URL!.split("?")[0];
 
-//   const adapter = new PrismaPg(
-//     { connectionString: baseURL },
-//     { schema: schemaId }
-//   );
+  const adapter = new PrismaPg(
+    { connectionString: baseURL },
+    { schema: schemaId }
+  );
 
-//   prisma = new PrismaClient({
-//     adapter
-//   });
+  prisma = new PrismaClient({
+    adapter
+  });
 
-//   await prisma.$connect();
-// });
+  await prisma.$connect();
+});
 
-// afterAll(async () => {
-//   if (!prisma) return;
+afterAll(async () => {
+  if (!prisma) return;
 
-//   try {
-//     await prisma.$executeRawUnsafe(
-//       `DROP SCHEMA IF EXISTS "${schemaId}" CASCADE`
-//     );
-//   } catch (error) {
-//     console.error(`Failed to drop schema ${schemaId}:`, error);
-//   } finally {
-//     await prisma.$disconnect();
-//   }
-// });
+  try {
+    await prisma.$executeRawUnsafe(
+      `DROP SCHEMA IF EXISTS "${schemaId}" CASCADE`
+    );
+  } catch (error) {
+    console.error(`Failed to drop schema ${schemaId}:`, error);
+  } finally {
+    await prisma.$disconnect();
+  }
+});

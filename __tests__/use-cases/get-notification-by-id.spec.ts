@@ -14,7 +14,7 @@ describe("Create Notification", () => {
   });
 
   it("should be able to get a notification by id", async () => {
-    const notification = notificationBuilder(new UniqueEntityID());
+    const notification = notificationBuilder({}, new UniqueEntityID());
 
     await notificationRepository.create(notification);
 

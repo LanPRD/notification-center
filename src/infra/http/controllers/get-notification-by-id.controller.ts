@@ -7,6 +7,7 @@ import {
   getNotificationByIdSchema,
   GetNotificationResponseDto
 } from "../dtos/get-notification-by-id.dto";
+import { NotificationPresenter } from "../presenters/notification-presenter";
 
 @Controller()
 @ApiTags("Notifications")
@@ -20,6 +21,12 @@ export class GetNotificationByIdController {
   @UsePipes(new ZodValidationPipe(getNotificationByIdSchema))
   async handle(@Param("id") id: string) {
     const result = await this.useCase.execute(id);
-    return result;
+
+    if (result.isLeft()) {
+      console.log(result.value);
+      throw result.value;
+    }
+
+    return NotificationPresenter.toHTTP(result.value.notification);
   }
 }
