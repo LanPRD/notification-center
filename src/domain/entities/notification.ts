@@ -13,37 +13,35 @@ interface NotificationProps {
 }
 
 export class Notification extends Entity<NotificationProps> {
-  public get content(): Record<string, any> {
+  get content(): Record<string, any> {
     return this.props.content;
   }
 
-  public get externalId(): string | null {
+  get externalId(): string | null {
     return this.props.externalId;
   }
 
-  public get userId(): string {
+  get userId(): string {
     return this.props.userId.toString();
   }
 
-  public get createdAt(): Date {
+  get createdAt(): Date {
     return this.props.createdAt;
   }
 
-  public get templateName(): string {
+  get templateName(): string {
     return this.props.templateName;
   }
 
-  public get priority(): "LOW" | "MEDIUM" | "HIGH" {
+  get priority(): "LOW" | "MEDIUM" | "HIGH" {
     return this.props.priority;
   }
 
-  public get status(): "PENDING" | "SENT" | "PARTIAL" | "FAILED" | "CANCELED" {
+  get status(): "PENDING" | "SENT" | "PARTIAL" | "FAILED" | "CANCELED" {
     return this.props.status;
   }
 
-  public set status(
-    status: "PENDING" | "SENT" | "PARTIAL" | "FAILED" | "CANCELED"
-  ) {
+  set status(status: "PENDING" | "SENT" | "PARTIAL" | "FAILED" | "CANCELED") {
     this.props.status = status;
   }
 

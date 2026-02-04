@@ -13,6 +13,7 @@ import {
   idempotencyKeySchema,
   type CreateNotificationDto
 } from "@/infra/http/dtos/create-notification.dto";
+import { EventsService, MESSAGE_PATTERNS } from "@/infra/messaging";
 import { Injectable } from "@nestjs/common";
 import { addHours } from "date-fns";
 import { z } from "zod";
@@ -37,6 +38,7 @@ export class CreateNotificationUseCase {
     private readonly idempotencyKeyRepository: IdempotencyKeyRepository,
     private readonly notificationRepository: NotificationRepository,
     private readonly userRepository: UserRepository,
+    private readonly eventsService: EventsService,
     private readonly unitOfWork: UnitOfWork
   ) {}
 
@@ -142,6 +144,30 @@ export class CreateNotificationUseCase {
 
     if (result.isLeft()) return left(result.value);
 
+    await this.emitEvent(result.value.notification);
+
     return right({ notification: result.value.notification });
+  }
+
+  private async emitEvent(notification: Notification): Promise<void> {
+    if (notification.priority === "HIGH") {
+      await this.eventsService.emitHigh(MESSAGE_PATTERNS.NOTIFICATION_PENDING, {
+        notificationId: notification.id.toString(),
+        userId: notification.userId.toString()
+      });
+    } else if (notification.priority === "MEDIUM") {
+      await this.eventsService.emitMedium(
+        MESSAGE_PATTERNS.NOTIFICATION_PENDING,
+        {
+          notificationId: notification.id.toString(),
+          userId: notification.userId.toString()
+        }
+      );
+    } else {
+      await this.eventsService.emitLow(MESSAGE_PATTERNS.NOTIFICATION_PENDING, {
+        notificationId: notification.id.toString(),
+        userId: notification.userId.toString()
+      });
+    }
   }
 }

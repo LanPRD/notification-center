@@ -31,6 +31,8 @@ async function bootstrap() {
   const rabbitmqUrl = configService.get("RABBITMQ_URL");
 
   // Connect RabbitMQ microservices for consuming messages
+
+  // HIGH PRIORITY - Processa imediatamente, pega mais mensagens por vez
   app.connectMicroservice<MicroserviceOptions>({
     transport: Transport.RMQ,
     options: {
@@ -40,10 +42,11 @@ async function bootstrap() {
         durable: true
       },
       noAck: false,
-      prefetchCount: 1
+      prefetchCount: 10
     }
   });
 
+  // MEDIUM PRIORITY - Processa normalmente
   app.connectMicroservice<MicroserviceOptions>({
     transport: Transport.RMQ,
     options: {
@@ -53,10 +56,11 @@ async function bootstrap() {
         durable: true
       },
       noAck: false,
-      prefetchCount: 1
+      prefetchCount: 3
     }
   });
 
+  // LOW PRIORITY - Processa quando houver capacidade
   app.connectMicroservice<MicroserviceOptions>({
     transport: Transport.RMQ,
     options: {

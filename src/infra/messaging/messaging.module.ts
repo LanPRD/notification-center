@@ -1,3 +1,4 @@
+import { OnNotificationCreated } from "@/application/events/on-notification-created";
 import { Module } from "@nestjs/common";
 import { ClientsModule, Transport } from "@nestjs/microservices";
 import { EnvModule } from "../env/env.module";
@@ -19,9 +20,7 @@ import { NotificationWorker } from "./workers";
             queue: envService.get("RABBITMQ_QUEUE_HIGH"),
             queueOptions: {
               durable: true
-            },
-            noAck: false,
-            prefetchCount: 1
+            }
           }
         })
       },
@@ -36,9 +35,7 @@ import { NotificationWorker } from "./workers";
             queue: envService.get("RABBITMQ_QUEUE_MEDIUM"),
             queueOptions: {
               durable: true
-            },
-            noAck: false,
-            prefetchCount: 1
+            }
           }
         })
       },
@@ -53,16 +50,14 @@ import { NotificationWorker } from "./workers";
             queue: envService.get("RABBITMQ_QUEUE_LOW"),
             queueOptions: {
               durable: true
-            },
-            noAck: false,
-            prefetchCount: 1
+            }
           }
         })
       }
     ])
   ],
   controllers: [NotificationWorker],
-  providers: [EventsService],
+  providers: [EventsService, OnNotificationCreated],
   exports: [EventsService]
 })
 export class MessagingModule {}
