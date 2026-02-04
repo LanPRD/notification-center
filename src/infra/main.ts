@@ -1,4 +1,5 @@
 import { NestFactory } from "@nestjs/core";
+import { MicroserviceOptions, Transport } from "@nestjs/microservices";
 import {
   FastifyAdapter,
   type NestFastifyApplication
@@ -20,13 +21,56 @@ async function bootstrap() {
     .setDescription("API for managing notifications")
     .setVersion("1.0")
     .build();
+
   const documentFactory = () => SwaggerModule.createDocument(app, config);
 
   SwaggerModule.setup("api", app, documentFactory);
 
   const configService = app.get(EnvService);
   const port = configService.get("PORT");
+  const rabbitmqUrl = configService.get("RABBITMQ_URL");
 
+  // Connect RabbitMQ microservices for consuming messages
+  app.connectMicroservice<MicroserviceOptions>({
+    transport: Transport.RMQ,
+    options: {
+      urls: [rabbitmqUrl],
+      queue: configService.get("RABBITMQ_QUEUE_HIGH"),
+      queueOptions: {
+        durable: true
+      },
+      noAck: false,
+      prefetchCount: 1
+    }
+  });
+
+  app.connectMicroservice<MicroserviceOptions>({
+    transport: Transport.RMQ,
+    options: {
+      urls: [rabbitmqUrl],
+      queue: configService.get("RABBITMQ_QUEUE_MEDIUM"),
+      queueOptions: {
+        durable: true
+      },
+      noAck: false,
+      prefetchCount: 1
+    }
+  });
+
+  app.connectMicroservice<MicroserviceOptions>({
+    transport: Transport.RMQ,
+    options: {
+      urls: [rabbitmqUrl],
+      queue: configService.get("RABBITMQ_QUEUE_LOW"),
+      queueOptions: {
+        durable: true
+      },
+      noAck: false,
+      prefetchCount: 1
+    }
+  });
+
+  await app.startAllMicroservices();
   await app.listen(port);
 }
 
