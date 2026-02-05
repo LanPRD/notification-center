@@ -5,6 +5,7 @@ import { left, right, type Either } from "@/core/either";
 import { UniqueEntityID } from "@/core/entities/unique-entity-id";
 import { IdempotencyKey } from "@/domain/entities/idempotency-key";
 import { Notification } from "@/domain/entities/notification";
+import { NotificationStatus } from "@/domain/enums/notification-status";
 import { IdempotencyKeyRepository } from "@/domain/repositories/idempotency-key-repository";
 import { NotificationRepository } from "@/domain/repositories/notification-repository";
 import { UnitOfWork } from "@/domain/repositories/unit-of-work";
@@ -124,7 +125,7 @@ export class CreateNotificationUseCase {
         userId: new UniqueEntityID(userId),
         externalId,
         priority,
-        status: "PENDING",
+        status: NotificationStatus.PENDING,
         templateName
       });
 

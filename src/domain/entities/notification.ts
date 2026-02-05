@@ -1,14 +1,16 @@
 import { Entity } from "@/core/entities/entity";
 import type { UniqueEntityID } from "@/core/entities/unique-entity-id";
 import type { Optional } from "@/core/types/optional";
+import type { NotificationPriority } from "../enums/notification-priority";
+import type { NotificationStatus } from "../enums/notification-status";
 
 interface NotificationProps {
   content: any;
   userId: UniqueEntityID;
   externalId: string | null;
   templateName: string;
-  priority: "LOW" | "MEDIUM" | "HIGH";
-  status: "PENDING" | "SENT" | "PARTIAL" | "FAILED" | "CANCELED";
+  priority: NotificationPriority;
+  status: NotificationStatus;
   createdAt: Date;
 }
 
@@ -33,15 +35,15 @@ export class Notification extends Entity<NotificationProps> {
     return this.props.templateName;
   }
 
-  get priority(): "LOW" | "MEDIUM" | "HIGH" {
+  get priority(): NotificationPriority {
     return this.props.priority;
   }
 
-  get status(): "PENDING" | "SENT" | "PARTIAL" | "FAILED" | "CANCELED" {
+  get status(): NotificationStatus {
     return this.props.status;
   }
 
-  set status(status: "PENDING" | "SENT" | "PARTIAL" | "FAILED" | "CANCELED") {
+  set status(status: NotificationStatus) {
     this.props.status = status;
   }
 

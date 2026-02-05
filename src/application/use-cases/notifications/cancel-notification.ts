@@ -1,6 +1,7 @@
 import { ConflictException } from "@/application/errors/conflict-exception";
 import { NotFoundException } from "@/application/errors/not-found-exception";
 import { left, right, type Either } from "@/core/either";
+import { NotificationStatus } from "@/domain/enums/notification-status";
 import { NotificationRepository } from "@/domain/repositories/notification-repository";
 import { Injectable } from "@nestjs/common";
 
@@ -35,7 +36,7 @@ export class CancelNotificationUseCase {
       );
     }
 
-    notification.status = "CANCELED";
+    notification.status = NotificationStatus.CANCELED;
 
     await this.notificationRepository.update(notification);
 

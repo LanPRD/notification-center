@@ -1,4 +1,4 @@
-import { $Enums } from "@prisma/client";
+import { NotificationPriority } from "@/domain/enums/notification-priority";
 import { createZodDto } from "nestjs-zod";
 import { z } from "zod";
 
@@ -6,7 +6,7 @@ export const createNotificationBodySchema = z.object({
   userId: z.uuid(),
   templateName: z.string().min(1),
   content: z.record(z.string(), z.any()),
-  priority: z.enum($Enums.NotificationPriority),
+  priority: z.enum(NotificationPriority),
   externalId: z.string().optional()
 });
 

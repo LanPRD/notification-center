@@ -1,4 +1,5 @@
 import { UniqueEntityID } from "@/core/entities/unique-entity-id";
+import { NotificationPriority } from "@/domain/enums/notification-priority";
 import { PrismaUserMapper } from "@/infra/database/mappers/prisma-user-mapper";
 import { PrismaService } from "@/infra/database/prisma/prisma.service";
 import type { CreateNotificationDto } from "@/infra/http/dtos/create-notification.dto";
@@ -38,7 +39,7 @@ describe("Create notification (E2E)", () => {
       userId: userCreated.id,
       templateName: "welcome_email",
       content: { firstName: "John", signupDate: "2024-01-01" },
-      priority: "HIGH",
+      priority: NotificationPriority.HIGH,
       externalId: externalId
     };
 
@@ -140,7 +141,7 @@ describe("Create notification (E2E)", () => {
       userId: userCreated.id,
       templateName: "welcome_email",
       content: { firstName: "John", signupDate: "2024-01-01" },
-      priority: "HIGH",
+      priority: NotificationPriority.HIGH,
       externalId: externalId
     };
 

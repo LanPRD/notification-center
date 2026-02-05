@@ -4,6 +4,8 @@ import { CreateNotificationUseCase } from "@/application/use-cases/notifications
 import { UniqueEntityID } from "@/core/entities/unique-entity-id";
 import { IdempotencyKey } from "@/domain/entities/idempotency-key";
 import { Notification } from "@/domain/entities/notification";
+import { NotificationPriority } from "@/domain/enums/notification-priority";
+import { NotificationStatus } from "@/domain/enums/notification-status";
 import { BadRequestException } from "@nestjs/common";
 import { IkFactory } from "__tests__/factories/ik-builder";
 import { UserFactory } from "__tests__/factories/user-builder";
@@ -62,7 +64,7 @@ describe("Create Notification", () => {
         content,
         userId: userCreated.id.toString(),
         externalId: "unique-external-id",
-        priority: "HIGH",
+        priority: NotificationPriority.HIGH,
         templateName: "WELCOME_EMAIL"
       },
       rawHeader: { ["idempotency-key"]: idempotencyKeyHash.toString() }
@@ -89,7 +91,7 @@ describe("Create Notification", () => {
         content,
         userId: user.id.toString(),
         externalId: "unique-external-id",
-        priority: "HIGH",
+        priority: NotificationPriority.HIGH,
         templateName: "WELCOME_EMAIL"
       },
       rawHeader: { ["idempotency-key"]: idempotencyKeyHash.toString() }
@@ -125,7 +127,7 @@ describe("Create Notification", () => {
           content: { title: "t", body: "b" },
           userId: user.id.toString(),
           externalId: "ext-rollback",
-          priority: "HIGH",
+          priority: NotificationPriority.HIGH,
           templateName: "WELCOME_EMAIL"
         },
         rawHeader: { ["idempotency-key"]: new UniqueEntityID().toString() }
@@ -147,7 +149,7 @@ describe("Create Notification", () => {
         content,
         userId: "user123",
         externalId: "unique-external-id",
-        priority: "HIGH",
+        priority: NotificationPriority.HIGH,
         templateName: "WELCOME_EMAIL"
       },
       rawHeader: { ["idempotency-key"]: "invalid-idempotency-key" }
@@ -168,7 +170,7 @@ describe("Create Notification", () => {
         content,
         userId: "user123",
         externalId: "",
-        priority: "HIGH",
+        priority: NotificationPriority.HIGH,
         templateName: "WELCOME_EMAIL"
       },
       rawHeader: { ["idempotency-key"]: new UniqueEntityID().toString() }
@@ -193,9 +195,9 @@ describe("Create Notification", () => {
       content,
       userId: userCreated.id,
       externalId,
-      priority: "HIGH",
+      priority: NotificationPriority.HIGH,
       templateName: "WELCOME_EMAIL",
-      status: "PENDING"
+      status: NotificationStatus.PENDING
     });
 
     await notificationRepository.create(notification);
@@ -212,7 +214,7 @@ describe("Create Notification", () => {
         content,
         userId: userCreated.id.toString(),
         externalId,
-        priority: "HIGH",
+        priority: NotificationPriority.HIGH,
         templateName: "WELCOME_EMAIL"
       },
       rawHeader: { ["idempotency-key"]: fakeIk }
@@ -237,7 +239,7 @@ describe("Create Notification", () => {
         content,
         userId: "user123",
         externalId: "unique-external-id",
-        priority: "HIGH",
+        priority: NotificationPriority.HIGH,
         templateName: "WELCOME_EMAIL"
       },
       rawHeader: { ["idempotency-key"]: idempotencyKeyHash.toString() }
@@ -263,9 +265,9 @@ describe("Create Notification", () => {
       content,
       userId: userCreated.id,
       externalId: "duplicate-external-id",
-      priority: "HIGH",
+      priority: NotificationPriority.HIGH,
       templateName: "WELCOME_EMAIL",
-      status: "PENDING"
+      status: NotificationStatus.PENDING
     });
 
     await notificationRepository.create(notification);
@@ -275,7 +277,7 @@ describe("Create Notification", () => {
         content,
         userId: userCreated.id.toString(),
         externalId: "duplicate-external-id",
-        priority: "HIGH",
+        priority: NotificationPriority.HIGH,
         templateName: "WELCOME_EMAIL"
       },
       rawHeader: { ["idempotency-key"]: new UniqueEntityID().toString() }

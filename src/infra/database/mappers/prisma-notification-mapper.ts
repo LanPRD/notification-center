@@ -1,5 +1,7 @@
 import { UniqueEntityID } from "@/core/entities/unique-entity-id";
 import { Notification } from "@/domain/entities/notification";
+import type { NotificationPriority } from "@/domain/enums/notification-priority";
+import type { NotificationStatus } from "@/domain/enums/notification-status";
 import type {
   Prisma,
   Notification as PrismaNotification
@@ -14,8 +16,8 @@ export class PrismaNotificationMapper {
         userId: new UniqueEntityID(raw.userId),
         createdAt: raw.createdAt,
         templateName: raw.templateName,
-        priority: raw.priority,
-        status: raw.status
+        priority: raw.priority as NotificationPriority,
+        status: raw.status as NotificationStatus
       },
       new UniqueEntityID(raw.id)
     );
