@@ -19,4 +19,14 @@ export class PrismaNotificationLogRepository implements NotificationLogRepositor
       data: PrismaNotificationLogMapper.toPrisma(log)
     });
   }
+
+  async getByNotificationId(
+    notificationId: string
+  ): Promise<NotificationLog[]> {
+    const logs = await this.prisma.notificationLog.findMany({
+      where: { notificationId }
+    });
+
+    return logs.map(PrismaNotificationLogMapper.toDomain);
+  }
 }
