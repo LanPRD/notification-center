@@ -1,6 +1,6 @@
 import { CancelNotificationUseCase } from "@/application/use-cases/notifications/cancel-notification";
 import { CreateNotificationUseCase } from "@/application/use-cases/notifications/create-notification";
-import { GetAllNotificationsByUserIdUseCase } from "@/application/use-cases/notifications/get-all-notifications-by-user-id";
+import { GetAllNotificationsByUserIdUseCase } from "@/application/use-cases/notifications/get-all-notifications";
 import { GetNotificationByIdUseCase } from "@/application/use-cases/notifications/get-notification-by-id";
 import { CreateUserUseCase } from "@/application/use-cases/users/create-user";
 import { Module } from "@nestjs/common";

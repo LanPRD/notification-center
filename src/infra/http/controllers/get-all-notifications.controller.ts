@@ -1,4 +1,4 @@
-import { GetAllNotificationsByUserIdUseCase } from "@/application/use-cases/notifications/get-all-notifications-by-user-id";
+import { GetAllNotificationsByUserIdUseCase } from "@/application/use-cases/notifications/get-all-notifications";
 import { Controller, Get, HttpCode, UsePipes } from "@nestjs/common";
 import { ApiNotFoundResponse, ApiOkResponse, ApiTags } from "@nestjs/swagger";
 import { ZodValidationPipe } from "nestjs-zod";
@@ -21,14 +21,6 @@ export class GetAllNotificationsByUserIdController {
   @UsePipes(new ZodValidationPipe(getNotificationByIdSchema))
   async handle() {
     const result = await this.useCase.execute();
-
-    if (result.isLeft()) {
-      console.log(result.value);
-      throw result.value;
-    }
-
-    return result.value.notifications.map(
-      NotificationPresenter.toHTTPWithDetails
-    );
+    return result.map(NotificationPresenter.toHTTPWithDetails);
   }
 }

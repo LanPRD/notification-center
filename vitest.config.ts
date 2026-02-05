@@ -16,7 +16,8 @@ export default defineConfig({
         "/dist/**",
         "*.config.*ts",
         "/scripts/**",
-        "/node_modules/**"
+        "/node_modules/**",
+        "**/dtos/**"
       ]
     }
   },
