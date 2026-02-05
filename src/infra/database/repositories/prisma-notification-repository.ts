@@ -1,14 +1,24 @@
+import type { NotificationDetails } from "@/application/dtos/notification-details.dto";
 import type { Notification } from "@/domain/entities/notification";
+import type { NotificationStatus } from "@/domain/enums/notification-status";
 import type { NotificationRepository } from "@/domain/repositories/notification-repository";
 import { Injectable } from "@nestjs/common";
 import { Prisma } from "@prisma/client";
 import { PrismaNotificationMapper } from "../mappers/prisma-notification-mapper";
 import { PrismaService } from "../prisma/prisma.service";
-import type { NotificationStatus } from "@/domain/enums/notification-status";
 
 @Injectable()
 export class PrismaNotificationRepository implements NotificationRepository {
   constructor(private readonly prisma: PrismaService) {}
+
+  async getAllWithDetails(): Promise<NotificationDetails[]> {
+    const notifications = await this.prisma.notification.findMany({
+      include: { user: true, logs: true },
+      orderBy: { createdAt: "desc" }
+    });
+
+    return notifications.map(PrismaNotificationMapper.toDetails);
+  }
 
   async updateStatus(id: string, status: NotificationStatus): Promise<void> {
     await this.prisma.notification.update({

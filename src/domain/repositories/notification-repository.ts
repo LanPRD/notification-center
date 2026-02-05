@@ -1,8 +1,10 @@
+import type { NotificationDetails } from "@/application/dtos/notification-details.dto";
 import type { Notification } from "../entities/notification";
 import type { NotificationStatus } from "../enums/notification-status";
 
 export abstract class NotificationRepository {
   abstract findById(id: string): Promise<Notification | null>;
+  abstract getAllWithDetails(): Promise<NotificationDetails[]>;
   abstract create(
     notification: Notification,
     tx?: unknown

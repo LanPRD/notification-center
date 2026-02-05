@@ -1,9 +1,25 @@
+import type { NotificationDetails } from "@/application/dtos/notification-details.dto";
 import type { Notification } from "@/domain/entities/notification";
 import type { NotificationStatus } from "@/domain/enums/notification-status";
 import type { NotificationRepository } from "@/domain/repositories/notification-repository";
 
 export class InMemoryNotificationRepository implements NotificationRepository {
   public notifications: Notification[] = [];
+
+  async getAllWithDetails(): Promise<NotificationDetails[]> {
+    return this.notifications.map(n => ({
+      id: n.id.toString(),
+      content: n.content,
+      userId: n.userId,
+      externalId: n.externalId,
+      templateName: n.templateName,
+      priority: n.priority,
+      status: n.status,
+      createdAt: n.createdAt,
+      user: { id: n.userId, email: "", phoneNumber: null, pushToken: null },
+      logs: []
+    }));
+  }
 
   async updateStatus(id: string, status: NotificationStatus): Promise<void> {
     const notification = await this.findById(id);
