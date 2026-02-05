@@ -17,7 +17,9 @@ export default defineConfig({
         "*.config.*ts",
         "/scripts/**",
         "/node_modules/**",
-        "**/dtos/**"
+        "**/dtos/**",
+        "**/infra/http/**",
+        "**/infra/database/**"
       ]
     }
   },
