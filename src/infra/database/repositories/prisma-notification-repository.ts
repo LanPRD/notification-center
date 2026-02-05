@@ -4,10 +4,18 @@ import { Injectable } from "@nestjs/common";
 import { Prisma } from "@prisma/client";
 import { PrismaNotificationMapper } from "../mappers/prisma-notification-mapper";
 import { PrismaService } from "../prisma/prisma.service";
+import type { NotificationStatus } from "@/domain/enums/notification-status";
 
 @Injectable()
 export class PrismaNotificationRepository implements NotificationRepository {
   constructor(private readonly prisma: PrismaService) {}
+
+  async updateStatus(id: string, status: NotificationStatus): Promise<void> {
+    await this.prisma.notification.update({
+      where: { id: id },
+      data: { status: status }
+    });
+  }
 
   async findByUserAndExternalId(
     userId: string,

@@ -1,4 +1,5 @@
 import type { Notification } from "../entities/notification";
+import type { NotificationStatus } from "../enums/notification-status";
 
 export abstract class NotificationRepository {
   abstract findById(id: string): Promise<Notification | null>;
@@ -12,4 +13,5 @@ export abstract class NotificationRepository {
     externalId: string,
     tx?: unknown
   ): Promise<Notification | null>;
+  abstract updateStatus(id: string, status: NotificationStatus): Promise<void>;
 }
