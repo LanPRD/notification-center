@@ -29,12 +29,6 @@ export class NotificationWorker {
 
       await this.onNotificationCreated.execute(data);
 
-      // TODO: Implement notification processing logic here
-      // 1. Buscar notificação no banco (via Use Case ou Repository)
-      // 2. Validar se ainda está pendente
-      // 3. Enviar notificação (email, SMS, push, etc.)
-      // 4. Atualizar status no banco
-
       channel.ack(originalMsg);
       this.logger.log(`Message processed successfully: ${pattern}`);
     } catch (error) {

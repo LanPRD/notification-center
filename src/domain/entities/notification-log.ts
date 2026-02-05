@@ -7,7 +7,7 @@ interface NotificationLogProps {
   notificationId: UniqueEntityID;
   channel: string;
   status: NotificationLogStatus;
-  errorMessage: string;
+  errorMessage: string | null;
   sentAt: Date;
 }
 
@@ -24,7 +24,7 @@ export class NotificationLog extends Entity<NotificationLogProps> {
     return this.props.status;
   }
 
-  get errorMessage(): string {
+  get errorMessage(): string | null {
     return this.props.errorMessage;
   }
 
