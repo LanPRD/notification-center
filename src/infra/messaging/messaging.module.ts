@@ -1,6 +1,7 @@
 import { OnNotificationCreated } from "@/application/events/on-notification-created";
 import { Module } from "@nestjs/common";
 import { ClientsModule, Transport } from "@nestjs/microservices";
+import { DatabaseModule } from "../database/database.module";
 import { EnvModule } from "../env/env.module";
 import { EnvService } from "../env/env.service";
 import { EventsService } from "./publishers";
@@ -8,6 +9,7 @@ import { NotificationWorker } from "./workers";
 
 @Module({
   imports: [
+    DatabaseModule,
     ClientsModule.registerAsync([
       {
         name: "RABBITMQ_HIGH_PRIORITY",

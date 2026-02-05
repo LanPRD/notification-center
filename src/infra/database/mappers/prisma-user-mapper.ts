@@ -16,6 +16,7 @@ export class PrismaUserMapper {
 
   static toPrisma(user: User): Prisma.UserUncheckedCreateInput {
     return {
+      id: user.id.toString(),
       email: user.email,
       phoneNumber: user.phoneNumber,
       pushToken: user.pushToken

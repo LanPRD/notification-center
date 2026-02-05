@@ -1,12 +1,5 @@
-import { PrismaService } from "@/infra/database/prisma/prisma.service";
-import {
-  Body,
-  ConflictException,
-  Controller,
-  HttpCode,
-  Post,
-  UsePipes
-} from "@nestjs/common";
+import { CreateUserUseCase } from "@/application/use-cases/users/create-user";
+import { Body, Controller, HttpCode, Post, UsePipes } from "@nestjs/common";
 import {
   ApiBody,
   ApiConflictResponse,
@@ -17,11 +10,12 @@ import { ZodValidationPipe } from "nestjs-zod";
 import { CreateUserDto, createUserSchema } from "../dtos/create-user.dto";
 import { BaseErrorResponseDto } from "../dtos/error-response.dto";
 import { UserResponseDto } from "../dtos/user-response.dto";
+import { UserPresenter } from "../presenters/user-presenter";
 
 @Controller("/users")
 @ApiTags("Users")
 export class CreateUserController {
-  constructor(private readonly prisma: PrismaService) {}
+  constructor(private readonly useCase: CreateUserUseCase) {}
 
   @Post()
   @HttpCode(201)
@@ -30,16 +24,13 @@ export class CreateUserController {
   @ApiConflictResponse({ type: BaseErrorResponseDto })
   @UsePipes(new ZodValidationPipe(createUserSchema))
   async handle(@Body() body: CreateUserDto): Promise<UserResponseDto> {
-    const userAlreadyExist = await this.checkUserAlreadyExists(body.email);
+    const result = await this.useCase.execute({ input: body });
 
-    if (userAlreadyExist) {
-      throw new ConflictException("User with the same email already exists.");
+    if (result.isLeft()) {
+      console.log(result.value);
+      throw result.value;
     }
 
-    return this.prisma.user.create({ data: body });
-  }
-
-  private async checkUserAlreadyExists(email: string): Promise<boolean> {
-    return (await this.prisma.user.count({ where: { email } })) > 0;
+    return UserPresenter.toHTTP(result.value.user, result.value.userPrefs);
   }
 }

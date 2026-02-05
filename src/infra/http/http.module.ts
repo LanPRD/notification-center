@@ -1,6 +1,7 @@
 import { CancelNotificationUseCase } from "@/application/use-cases/notifications/cancel-notification";
 import { CreateNotificationUseCase } from "@/application/use-cases/notifications/create-notification";
 import { GetNotificationByIdUseCase } from "@/application/use-cases/notifications/get-notification-by-id";
+import { CreateUserUseCase } from "@/application/use-cases/users/create-user";
 import { Module } from "@nestjs/common";
 import { DatabaseModule } from "../database/database.module";
 import { MessagingModule } from "../messaging/messaging.module";
@@ -20,7 +21,8 @@ import { GetNotificationByIdController } from "./controllers/get-notification-by
   providers: [
     CreateNotificationUseCase,
     GetNotificationByIdUseCase,
-    CancelNotificationUseCase
+    CancelNotificationUseCase,
+    CreateUserUseCase
   ]
 })
 export class HttpModule {}

@@ -36,4 +36,17 @@ export class PrismaNotificationMapper {
       userId: notification.userId.toString()
     };
   }
+
+  static toJSON(notification: Notification): Prisma.InputJsonValue {
+    return {
+      id: notification.id.toString(),
+      content: notification.content as Prisma.InputJsonValue,
+      externalId: notification.externalId,
+      templateName: notification.templateName,
+      priority: notification.priority,
+      status: notification.status,
+      createdAt: notification.createdAt.toISOString(),
+      userId: notification.userId.toString()
+    };
+  }
 }

@@ -6,7 +6,7 @@ export class NotificationPresenter {
       id: notification.id.toString(),
       status: notification.status,
       priority: notification.priority,
-      createdAt: notification.createdAt.toISOString()
+      createdAt: notification.createdAt
     };
   }
 }

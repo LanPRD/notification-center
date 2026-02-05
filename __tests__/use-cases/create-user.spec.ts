@@ -1,14 +1,20 @@
 import { ConflictException } from "@/application/errors/conflict-exception";
 import { CreateUserUseCase } from "@/application/use-cases/users/create-user";
+import { InMemoryUserPreferenceRepository } from "__tests__/repositories/in-memory-user-preference-repository";
 import { InMemoryUserRepository } from "__tests__/repositories/in-memory-user-repository";
 
+let inMemoryUserPreferenceRepository: InMemoryUserPreferenceRepository;
 let inMemoryUserRepository: InMemoryUserRepository;
 let sut: CreateUserUseCase;
 
 describe("Create User", () => {
   beforeEach(() => {
+    inMemoryUserPreferenceRepository = new InMemoryUserPreferenceRepository();
     inMemoryUserRepository = new InMemoryUserRepository();
-    sut = new CreateUserUseCase(inMemoryUserRepository);
+    sut = new CreateUserUseCase(
+      inMemoryUserRepository,
+      inMemoryUserPreferenceRepository
+    );
   });
 
   test("it should create a new user", async () => {

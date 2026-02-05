@@ -47,10 +47,10 @@ import { PrismaUserRepository } from "./repositories/prisma-user-repository";
     PrismaService,
     UnitOfWork,
     IdempotencyKeyRepository,
+    NotificationLogRepository,
     NotificationRepository,
     UserPreferenceRepository,
-    UserRepository,
-    NotificationLogRepository
+    UserRepository
   ]
 })
 export class DatabaseModule {}

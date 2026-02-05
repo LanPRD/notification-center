@@ -1,10 +1,11 @@
 import type { Optional } from "@/core/types/optional";
+import type { Notification } from "./notification";
 
 interface IdempotencyKeyProps {
   key: string;
   expiresAt: Date;
   createdAt: Date | null;
-  responseBody: any;
+  responseBody: Notification | null;
   responseStatus: number | null;
 }
 
@@ -31,11 +32,11 @@ export class IdempotencyKey {
     this.props.createdAt = value;
   }
 
-  get responseBody(): any {
+  get responseBody(): Notification | null {
     return this.props.responseBody;
   }
 
-  set responseBody(value: any) {
+  set responseBody(value: Notification | null) {
     this.props.responseBody = value;
   }
 
@@ -58,10 +59,10 @@ export class IdempotencyKey {
     >
   ): IdempotencyKey {
     return new IdempotencyKey({
-      ...props,
-      createdAt: new Date(),
       responseBody: null,
-      responseStatus: null
+      responseStatus: null,
+      ...props,
+      createdAt: new Date()
     });
   }
 }

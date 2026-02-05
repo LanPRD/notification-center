@@ -1,8 +1,10 @@
 import type { IdempotencyKey } from "@/domain/entities/idempotency-key";
+import type { Notification } from "@/domain/entities/notification";
 import type { IdempotencyKeyRepository } from "@/domain/repositories/idempotency-key-repository";
 import { Injectable } from "@nestjs/common";
 import { Prisma } from "@prisma/client";
 import { PrismaIdempotencyKeyMapper } from "../mappers/prisma-idempotency-key-mapper";
+import { PrismaNotificationMapper } from "../mappers/prisma-notification-mapper";
 import { PrismaService } from "../prisma/prisma.service";
 
 // prisma-idempotency-key-repository.ts
@@ -38,7 +40,7 @@ export class PrismaIdempotencyKeyRepository implements IdempotencyKeyRepository 
 
   async update(
     key: string,
-    data: { responseStatus: number; responseBody: any },
+    data: { responseStatus: number; responseBody: Notification },
     tx?: unknown
   ): Promise<void> {
     const db = (tx ?? this.prisma) as Prisma.TransactionClient | PrismaService;
@@ -47,7 +49,7 @@ export class PrismaIdempotencyKeyRepository implements IdempotencyKeyRepository 
       where: { key },
       data: {
         responseStatus: data.responseStatus,
-        responseBody: data.responseBody
+        responseBody: PrismaNotificationMapper.toJSON(data.responseBody)
       }
     });
   }

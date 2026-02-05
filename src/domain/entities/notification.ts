@@ -51,6 +51,6 @@ export class Notification extends Entity<NotificationProps> {
     props: Optional<NotificationProps, "createdAt">,
     id?: UniqueEntityID
   ): Notification {
-    return new Notification({ ...props, createdAt: new Date() }, id);
+    return new Notification({ createdAt: new Date(), ...props }, id);
   }
 }

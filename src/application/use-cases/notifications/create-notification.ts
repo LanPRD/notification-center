@@ -31,7 +31,10 @@ type CreateNotificationUseCaseResponse = Either<
   }
 >;
 
-type TxEither = Either<ConflictException, { notification: Notification }>;
+type TxEither = Either<
+  ConflictException,
+  { notification: Notification; created: boolean }
+>;
 
 @Injectable()
 export class CreateNotificationUseCase {
@@ -85,7 +88,8 @@ export class CreateNotificationUseCase {
       if (existingIk) {
         if (existingIk.responseStatus) {
           return right({
-            notification: existingIk.responseBody as unknown as Notification
+            notification: existingIk.responseBody!,
+            created: false
           });
         }
 
@@ -117,7 +121,7 @@ export class CreateNotificationUseCase {
           tx
         );
 
-        return right({ notification: existingNotification });
+        return right({ notification: existingNotification, created: false });
       }
 
       const notification = Notification.create({
@@ -140,12 +144,14 @@ export class CreateNotificationUseCase {
         tx
       );
 
-      return right({ notification: created });
+      return right({ notification: created, created: true });
     });
 
     if (result.isLeft()) return left(result.value);
 
-    await this.emitEvent(result.value.notification);
+    if (result.value.created) {
+      await this.emitEvent(result.value.notification);
+    }
 
     return right({ notification: result.value.notification });
   }

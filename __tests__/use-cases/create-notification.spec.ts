@@ -53,7 +53,6 @@ describe("Create Notification", () => {
     const ik = IdempotencyKey.create({
       key: idempotencyKeyHash.toString(),
       expiresAt: new Date(),
-      responseBody: {},
       responseStatus: 201
     });
 
@@ -110,9 +109,13 @@ describe("Create Notification", () => {
 
     // ✅ Verifica se o evento foi emitido
     expect(eventsService.getEventCount()).toBe(1);
-    expect(eventsService.hasEmittedEvent(MESSAGE_PATTERNS.NOTIFICATION_PENDING)).toBe(true);
+    expect(
+      eventsService.hasEmittedEvent(MESSAGE_PATTERNS.NOTIFICATION_PENDING)
+    ).toBe(true);
 
-    const emittedEvent = eventsService.getEmittedEvent(MESSAGE_PATTERNS.NOTIFICATION_PENDING);
+    const emittedEvent = eventsService.getEmittedEvent(
+      MESSAGE_PATTERNS.NOTIFICATION_PENDING
+    );
     expect(emittedEvent?.priority).toBe("HIGH");
     expect(emittedEvent?.data.userId).toBe(user.id.toString());
   });
