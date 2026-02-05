@@ -3,7 +3,7 @@ import { UserPreference } from "@/domain/entities/user-preference";
 import type { UserPreferenceRepository } from "@/domain/repositories/user-preference-repository";
 
 export class InMemoryUserPreferenceRepository implements UserPreferenceRepository {
-  private userPreferences: UserPreference[] = [];
+  public userPreferences: UserPreference[] = [];
 
   async register(user: User): Promise<UserPreference> {
     const userPref = UserPreference.create({

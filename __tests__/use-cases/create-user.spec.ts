@@ -28,9 +28,11 @@ describe("Create User", () => {
 
     expect(result.isRight()).toBe(true);
     expect(inMemoryUserRepository.users).toHaveLength(1);
-    expect(result.value).toEqual({
-      user: inMemoryUserRepository.users[0]
-    });
+
+    if (result.isRight()) {
+      expect(result.value.user).toEqual(inMemoryUserRepository.users[0]);
+      expect(inMemoryUserPreferenceRepository.userPreferences).toHaveLength(1);
+    }
   });
 
   test("it should not be able to create a user with an existing email", async () => {

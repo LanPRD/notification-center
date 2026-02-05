@@ -7,7 +7,7 @@ import { Notification } from "@/domain/entities/notification";
 import { NotificationPriority } from "@/domain/enums/notification-priority";
 import { NotificationStatus } from "@/domain/enums/notification-status";
 import { MESSAGE_PATTERNS } from "@/infra/messaging";
-import { BadRequestException } from "@nestjs/common";
+import { BadRequestException } from "@/application/errors/bad-request-exception";
 import { FakeEventsService } from "__tests__/doubles/fake-events-service";
 import { IkFactory } from "__tests__/factories/ik-builder";
 import { UserFactory } from "__tests__/factories/user-builder";
@@ -43,17 +43,15 @@ describe("Create Notification", () => {
     );
   });
 
-  test("it should throw an error when idempotency key already exists", async () => {
+  test("it should throw an error when idempotency key already exists and without response", async () => {
     const user = UserFactory.build();
-
     const userCreated = await userRepository.create(user);
 
     const idempotencyKeyHash = new UniqueEntityID();
 
     const ik = IdempotencyKey.create({
       key: idempotencyKeyHash.toString(),
-      expiresAt: new Date(),
-      responseStatus: 201
+      expiresAt: new Date()
     });
 
     await idempotencyKeyRepository.create(ik);
@@ -241,6 +239,7 @@ describe("Create Notification", () => {
     expect(notificationRepository.notifications[0].id).toEqual(notification.id);
     expect(idempotencyKeyRepository.idempotencyKeys).toHaveLength(1);
     expect(notificationRepository.notifications).toHaveLength(1);
+    expect(eventsService.getEventCount()).toBe(0);
   });
 
   test("it should not be able to create a notification if user doesn't exist", async () => {
@@ -304,6 +303,55 @@ describe("Create Notification", () => {
     expect(notificationRepository.notifications[0].id).toEqual(notification.id);
     expect(idempotencyKeyRepository.idempotencyKeys).toHaveLength(1);
     expect(notificationRepository.notifications).toHaveLength(1);
+    expect(eventsService.getEventCount()).toBe(0);
+  });
+
+  test("it should emit event with MEDIUM priority", async () => {
+    const user = UserFactory.build();
+    await userRepository.create(user);
+
+    const result = await sut.execute({
+      input: {
+        content: { title: "Test", body: "Body" },
+        userId: user.id.toString(),
+        externalId: "medium-priority-test",
+        priority: NotificationPriority.MEDIUM,
+        templateName: "WELCOME_EMAIL"
+      },
+      rawHeader: { ["idempotency-key"]: new UniqueEntityID().toString() }
+    });
+
+    expect(result.isRight()).toBe(true);
+    expect(eventsService.getEventCount()).toBe(1);
+
+    const emittedEvent = eventsService.getEmittedEvent(
+      MESSAGE_PATTERNS.NOTIFICATION_PENDING
+    );
+    expect(emittedEvent?.priority).toBe("MEDIUM");
+  });
+
+  test("it should emit event with LOW priority", async () => {
+    const user = UserFactory.build();
+    await userRepository.create(user);
+
+    const result = await sut.execute({
+      input: {
+        content: { title: "Test", body: "Body" },
+        userId: user.id.toString(),
+        externalId: "low-priority-test",
+        priority: NotificationPriority.LOW,
+        templateName: "WELCOME_EMAIL"
+      },
+      rawHeader: { ["idempotency-key"]: new UniqueEntityID().toString() }
+    });
+
+    expect(result.isRight()).toBe(true);
+    expect(eventsService.getEventCount()).toBe(1);
+
+    const emittedEvent = eventsService.getEmittedEvent(
+      MESSAGE_PATTERNS.NOTIFICATION_PENDING
+    );
+    expect(emittedEvent?.priority).toBe("LOW");
   });
 
   class FailingNotificationRepository extends InMemoryNotificationRepository {
