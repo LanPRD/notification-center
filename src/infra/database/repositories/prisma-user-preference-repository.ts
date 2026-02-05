@@ -1,12 +1,12 @@
 import type { User } from "@/domain/entities/user";
 import type { UserPreference } from "@/domain/entities/user-preference";
-import type { UserPreferencesRepository } from "@/domain/repositories/user-preferences-repository";
+import type { UserPreferenceRepository } from "@/domain/repositories/user-preference-repository";
 import { Injectable } from "@nestjs/common";
-import { PrismaService } from "../prisma/prisma.service";
 import { PrismaUserPreferenceMapper } from "../mappers/prisma-user-preference-mapper";
+import { PrismaService } from "../prisma/prisma.service";
 
 @Injectable()
-export class PrismaUserPreferenceRepository implements UserPreferencesRepository {
+export class PrismaUserPreferenceRepository implements UserPreferenceRepository {
   constructor(private readonly prisma: PrismaService) {}
 
   async register(user: User): Promise<UserPreference> {

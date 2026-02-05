@@ -6,7 +6,7 @@ import { NotificationLogStatus } from "@/domain/enums/notification-log-status";
 import { NotificationStatus } from "@/domain/enums/notification-status";
 import { NotificationLogRepository } from "@/domain/repositories/notification-log-repository";
 import { NotificationRepository } from "@/domain/repositories/notification-repository";
-import { UserPreferencesRepository } from "@/domain/repositories/user-preferences-repository";
+import { UserPreferenceRepository } from "@/domain/repositories/user-preference-repository";
 import { UserRepository } from "@/domain/repositories/user-repository";
 import { Injectable, Logger } from "@nestjs/common";
 
@@ -22,7 +22,7 @@ export class OnNotificationCreated {
   constructor(
     private readonly notificationLogsRepository: NotificationLogRepository,
     private readonly notificationRepository: NotificationRepository,
-    private readonly userPrefRepository: UserPreferencesRepository,
+    private readonly userPrefRepository: UserPreferenceRepository,
     private readonly userRepository: UserRepository
   ) {}
 
