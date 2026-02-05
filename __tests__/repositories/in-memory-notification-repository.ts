@@ -1,8 +1,17 @@
 import type { Notification } from "@/domain/entities/notification";
+import type { NotificationStatus } from "@/domain/enums/notification-status";
 import type { NotificationRepository } from "@/domain/repositories/notification-repository";
 
 export class InMemoryNotificationRepository implements NotificationRepository {
   public notifications: Notification[] = [];
+
+  async updateStatus(id: string, status: NotificationStatus): Promise<void> {
+    const notification = await this.findById(id);
+
+    if (notification) {
+      notification.status = status;
+    }
+  }
 
   async findByUserAndExternalId(
     userId: string,

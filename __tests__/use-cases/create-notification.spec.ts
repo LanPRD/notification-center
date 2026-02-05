@@ -6,7 +6,9 @@ import { IdempotencyKey } from "@/domain/entities/idempotency-key";
 import { Notification } from "@/domain/entities/notification";
 import { NotificationPriority } from "@/domain/enums/notification-priority";
 import { NotificationStatus } from "@/domain/enums/notification-status";
+import { MESSAGE_PATTERNS } from "@/infra/messaging";
 import { BadRequestException } from "@nestjs/common";
+import { FakeEventsService } from "__tests__/doubles/fake-events-service";
 import { IkFactory } from "__tests__/factories/ik-builder";
 import { UserFactory } from "__tests__/factories/user-builder";
 import { InMemoryIdempotencyKeyRepository } from "__tests__/repositories/in-memory-idempotency-key-repository";
@@ -17,6 +19,7 @@ import { InMemoryUserRepository } from "__tests__/repositories/in-memory-user-re
 let idempotencyKeyRepository: InMemoryIdempotencyKeyRepository;
 let notificationRepository: InMemoryNotificationRepository;
 let userRepository: InMemoryUserRepository;
+let eventsService: FakeEventsService;
 let unitOfWork: InMemoryUnitOfWork;
 let sut: CreateNotificationUseCase;
 
@@ -25,6 +28,7 @@ describe("Create Notification", () => {
     idempotencyKeyRepository = new InMemoryIdempotencyKeyRepository();
     notificationRepository = new InMemoryNotificationRepository();
     userRepository = new InMemoryUserRepository();
+    eventsService = new FakeEventsService();
     unitOfWork = new InMemoryUnitOfWork([
       idempotencyKeyRepository,
       notificationRepository
@@ -34,6 +38,7 @@ describe("Create Notification", () => {
       idempotencyKeyRepository,
       notificationRepository,
       userRepository,
+      eventsService,
       unitOfWork
     );
   });
@@ -102,6 +107,14 @@ describe("Create Notification", () => {
     expect(idempotencyKeyRepository.idempotencyKeys[0].key).toBe(
       idempotencyKeyHash.toString()
     );
+
+    // ✅ Verifica se o evento foi emitido
+    expect(eventsService.getEventCount()).toBe(1);
+    expect(eventsService.hasEmittedEvent(MESSAGE_PATTERNS.NOTIFICATION_PENDING)).toBe(true);
+
+    const emittedEvent = eventsService.getEmittedEvent(MESSAGE_PATTERNS.NOTIFICATION_PENDING);
+    expect(emittedEvent?.priority).toBe("HIGH");
+    expect(emittedEvent?.data.userId).toBe(user.id.toString());
   });
 
   test("it should rollback when notification creation fails (atomicity)", async () => {
@@ -118,6 +131,7 @@ describe("Create Notification", () => {
       idempotencyKeyRepository,
       notificationRepository,
       userRepository,
+      eventsService,
       unitOfWork
     );
 
