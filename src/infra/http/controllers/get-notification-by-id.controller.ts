@@ -1,11 +1,19 @@
 import { GetNotificationByIdUseCase } from "@/application/use-cases/notifications/get-notification-by-id";
-import { Controller, Get, HttpCode, Param, UsePipes } from "@nestjs/common";
-import { ApiNotFoundResponse, ApiOkResponse, ApiTags } from "@nestjs/swagger";
+import { Controller, Get, HttpCode, Param } from "@nestjs/common";
+import {
+  ApiBadRequestResponse,
+  ApiNotFoundResponse,
+  ApiOkResponse,
+  ApiOperation,
+  ApiParam,
+  ApiTags
+} from "@nestjs/swagger";
 import { ZodValidationPipe } from "nestjs-zod";
 import { BaseErrorResponseDto } from "../dtos/error-response.dto";
 import {
-  getNotificationByIdSchema,
-  GetNotificationResponseDto
+  GetNotificationByIdParamDto,
+  getNotificationByIdParamSchema,
+  GetNotificationByIdResponseDto
 } from "../dtos/get-notification-by-id.dto";
 import { NotificationPresenter } from "../presenters/notification-presenter";
 
@@ -16,14 +24,32 @@ export class GetNotificationByIdController {
 
   @Get("/notifications/:id")
   @HttpCode(200)
-  @ApiOkResponse({ type: GetNotificationResponseDto })
-  @ApiNotFoundResponse({ type: BaseErrorResponseDto })
-  @UsePipes(new ZodValidationPipe(getNotificationByIdSchema))
-  async handle(@Param("id") id: string) {
-    const result = await this.useCase.execute(id);
+  @ApiOperation({ summary: "Get a notification by ID" })
+  @ApiParam({
+    name: "id",
+    type: "string",
+    format: "uuid",
+    description: "The notification ID"
+  })
+  @ApiOkResponse({
+    description: "Notification retrieved successfully",
+    type: GetNotificationByIdResponseDto
+  })
+  @ApiBadRequestResponse({
+    description: "Invalid notification ID format",
+    type: BaseErrorResponseDto
+  })
+  @ApiNotFoundResponse({
+    description: "Notification not found",
+    type: BaseErrorResponseDto
+  })
+  async handle(
+    @Param(new ZodValidationPipe(getNotificationByIdParamSchema))
+    params: GetNotificationByIdParamDto
+  ) {
+    const result = await this.useCase.execute(params.id);
 
     if (result.isLeft()) {
-      console.log(result.value);
       throw result.value;
     }
 

@@ -11,17 +11,17 @@ import { NotificationRepository } from "@/domain/repositories/notification-repos
 import { UnitOfWork } from "@/domain/repositories/unit-of-work";
 import { UserRepository } from "@/domain/repositories/user-repository";
 import {
-  idempotencyKeySchema,
-  type CreateNotificationDto
-} from "@/infra/http/dtos/create-notification.dto";
+  idempotencyKeyHeaderSchema,
+  type CreateNotificationBodyDto
+} from "@/infra/http/dtos/notification.dto";
 import { EventsService, MESSAGE_PATTERNS } from "@/infra/messaging";
 import { Injectable } from "@nestjs/common";
 import { addHours } from "date-fns";
 import { z } from "zod";
 
 interface CreateNotificationInput {
-  input: CreateNotificationDto;
-  rawHeader: any;
+  input: CreateNotificationBodyDto;
+  rawHeader: Record<string, string>;
 }
 
 type CreateNotificationUseCaseResponse = Either<
@@ -51,7 +51,7 @@ export class CreateNotificationUseCase {
     rawHeader
   }: CreateNotificationInput): Promise<CreateNotificationUseCaseResponse> {
     const { content, userId, externalId, priority, templateName } = input;
-    const parsed = idempotencyKeySchema.safeParse(rawHeader);
+    const parsed = idempotencyKeyHeaderSchema.safeParse(rawHeader);
 
     if (!parsed.success) {
       return left(

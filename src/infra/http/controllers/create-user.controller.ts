@@ -1,15 +1,21 @@
 import { CreateUserUseCase } from "@/application/use-cases/users/create-user";
-import { Body, Controller, HttpCode, Post, UsePipes } from "@nestjs/common";
+import { Body, Controller, HttpCode, Post } from "@nestjs/common";
 import {
+  ApiBadRequestResponse,
   ApiBody,
   ApiConflictResponse,
   ApiCreatedResponse,
+  ApiInternalServerErrorResponse,
+  ApiOperation,
   ApiTags
 } from "@nestjs/swagger";
 import { ZodValidationPipe } from "nestjs-zod";
-import { CreateUserDto, createUserSchema } from "../dtos/create-user.dto";
 import { BaseErrorResponseDto } from "../dtos/error-response.dto";
-import { UserResponseDto } from "../dtos/user-response.dto";
+import {
+  CreateUserBodyDto,
+  createUserBodySchema,
+  UserResponseDto
+} from "../dtos/user.dto";
 import { UserPresenter } from "../presenters/user-presenter";
 
 @Controller("/users")
@@ -19,15 +25,30 @@ export class CreateUserController {
 
   @Post()
   @HttpCode(201)
-  @ApiBody({ type: CreateUserDto })
-  @ApiCreatedResponse({ type: UserResponseDto })
-  @ApiConflictResponse({ type: BaseErrorResponseDto })
-  @UsePipes(new ZodValidationPipe(createUserSchema))
-  async handle(@Body() body: CreateUserDto): Promise<UserResponseDto> {
+  @ApiOperation({ summary: "Create a new user" })
+  @ApiBody({ type: CreateUserBodyDto })
+  @ApiCreatedResponse({
+    description: "User created successfully",
+    type: UserResponseDto
+  })
+  @ApiBadRequestResponse({
+    description: "Invalid request body",
+    type: BaseErrorResponseDto
+  })
+  @ApiConflictResponse({
+    description: "User with the same email already exists",
+    type: BaseErrorResponseDto
+  })
+  @ApiInternalServerErrorResponse({
+    description: "Failed to create user or register preferences",
+    type: BaseErrorResponseDto
+  })
+  async handle(
+    @Body(new ZodValidationPipe(createUserBodySchema)) body: CreateUserBodyDto
+  ): Promise<UserResponseDto> {
     const result = await this.useCase.execute({ input: body });
 
     if (result.isLeft()) {
-      console.log(result.value);
       throw result.value;
     }
 

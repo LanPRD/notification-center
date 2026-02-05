@@ -1,26 +1,48 @@
 import { GetLogsByNotificationIdUseCase } from "@/application/use-cases/notifications/get-logs-by-notification-id";
-import { Controller, Get, HttpCode, Param, UsePipes } from "@nestjs/common";
-import { ApiNotFoundResponse, ApiOkResponse, ApiTags } from "@nestjs/swagger";
+import { Controller, Get, HttpCode, Param } from "@nestjs/common";
+import {
+  ApiBadRequestResponse,
+  ApiOkResponse,
+  ApiOperation,
+  ApiParam,
+  ApiTags
+} from "@nestjs/swagger";
 import { ZodValidationPipe } from "nestjs-zod";
 import { BaseErrorResponseDto } from "../dtos/error-response.dto";
 import {
-  getNotificationByIdSchema,
-  GetNotificationResponseDto
-} from "../dtos/get-notification-by-id.dto";
-import { NotificationLogPresenter } from "../presenters/notification-presenter copy";
+  GetLogsByNotificationIdParamDto,
+  getLogsByNotificationIdParamSchema,
+  GetLogsByNotificationIdResponseDto
+} from "../dtos/get-logs-by-notification-id.dto";
+import { NotificationLogPresenter } from "../presenters/notification-log-presenter";
 
 @Controller()
 @ApiTags("Notifications")
 export class GetLogsByNotificationIdController {
   constructor(private readonly useCase: GetLogsByNotificationIdUseCase) {}
 
-  @Get("/notifications/:id")
+  @Get("/notifications/:notificationId/logs")
   @HttpCode(200)
-  @ApiOkResponse({ type: GetNotificationResponseDto })
-  @ApiNotFoundResponse({ type: BaseErrorResponseDto })
-  @UsePipes(new ZodValidationPipe(getNotificationByIdSchema))
-  async handle(@Param("notificationId") notificationId: string) {
-    const result = await this.useCase.execute(notificationId);
+  @ApiOperation({ summary: "Get all logs for a notification" })
+  @ApiParam({
+    name: "notificationId",
+    type: "string",
+    format: "uuid",
+    description: "The notification ID"
+  })
+  @ApiOkResponse({
+    description: "Logs retrieved successfully",
+    type: [GetLogsByNotificationIdResponseDto]
+  })
+  @ApiBadRequestResponse({
+    description: "Invalid notification ID format",
+    type: BaseErrorResponseDto
+  })
+  async handle(
+    @Param(new ZodValidationPipe(getLogsByNotificationIdParamSchema))
+    params: GetLogsByNotificationIdParamDto
+  ) {
+    const result = await this.useCase.execute(params.notificationId);
     return result.map(NotificationLogPresenter.toHTTP);
   }
 }

@@ -1,5 +1,5 @@
 import type { NotificationLog } from "@/domain/entities/notification-log";
-import type { NotificationLogRepository } from "@/domain/repositories/notification-log-repository";
+import { NotificationLogRepository } from "@/domain/repositories/notification-log-repository";
 import { Injectable } from "@nestjs/common";
 
 @Injectable()

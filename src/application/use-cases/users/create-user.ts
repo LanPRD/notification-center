@@ -5,11 +5,11 @@ import { User } from "@/domain/entities/user";
 import { UserPreference } from "@/domain/entities/user-preference";
 import { UserPreferenceRepository } from "@/domain/repositories/user-preference-repository";
 import { UserRepository } from "@/domain/repositories/user-repository";
-import type { CreateUserDto } from "@/infra/http/dtos/create-user.dto";
+import type { CreateUserBodyDto } from "@/infra/http/dtos/user.dto";
 import { Injectable } from "@nestjs/common";
 
 interface CreateUserInput {
-  input: CreateUserDto;
+  input: CreateUserBodyDto;
 }
 
 type CreateUserUseCaseResponse = Either<

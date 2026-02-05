@@ -1,26 +1,22 @@
 import { CreateNotificationUseCase } from "@/application/use-cases/notifications/create-notification";
-import {
-  createNotificationBodySchema,
-  CreateNotificationDto
-} from "@/infra/http/dtos/create-notification.dto";
-import {
-  Body,
-  Controller,
-  Headers,
-  HttpCode,
-  Post,
-  UsePipes
-} from "@nestjs/common";
+import { Body, Controller, Headers, HttpCode, Post } from "@nestjs/common";
 import {
   ApiBadRequestResponse,
   ApiBody,
   ApiConflictResponse,
   ApiCreatedResponse,
   ApiHeader,
+  ApiNotFoundResponse,
+  ApiOperation,
   ApiTags
 } from "@nestjs/swagger";
 import { ZodValidationPipe } from "nestjs-zod";
 import { BaseErrorResponseDto } from "../dtos/error-response.dto";
+import {
+  CreateNotificationBodyDto,
+  createNotificationBodySchema,
+  NotificationResponseDto
+} from "../dtos/notification.dto";
 import { NotificationPresenter } from "../presenters/notification-presenter";
 
 @Controller("/notifications")
@@ -30,24 +26,38 @@ export class CreateNotificationController {
 
   @Post()
   @HttpCode(201)
-  @ApiBody({ type: CreateNotificationDto })
+  @ApiOperation({ summary: "Create a new notification" })
   @ApiHeader({
     name: "Idempotency-Key",
     required: true,
-    schema: {
-      type: "string",
-      format: "uuid"
-    }
+    description: "Unique key to ensure idempotent requests",
+    schema: { type: "string", format: "uuid" }
   })
-  @ApiCreatedResponse({ type: CreateNotificationDto })
-  @ApiConflictResponse({ type: BaseErrorResponseDto })
-  @ApiBadRequestResponse({ type: BaseErrorResponseDto })
-  @UsePipes(new ZodValidationPipe(createNotificationBodySchema))
-  async handle(@Headers() rawHeader: any, @Body() body: CreateNotificationDto) {
+  @ApiBody({ type: CreateNotificationBodyDto })
+  @ApiCreatedResponse({
+    description: "Notification created successfully",
+    type: NotificationResponseDto
+  })
+  @ApiBadRequestResponse({
+    description: "Invalid request body or missing idempotency key",
+    type: BaseErrorResponseDto
+  })
+  @ApiNotFoundResponse({
+    description: "User not found",
+    type: BaseErrorResponseDto
+  })
+  @ApiConflictResponse({
+    description: "Request is being processed (idempotency conflict)",
+    type: BaseErrorResponseDto
+  })
+  async handle(
+    @Headers() rawHeader: Record<string, string>,
+    @Body(new ZodValidationPipe(createNotificationBodySchema))
+    body: CreateNotificationBodyDto
+  ) {
     const result = await this.useCase.execute({ input: body, rawHeader });
 
     if (result.isLeft()) {
-      console.log(result.value);
       throw result.value;
     }
 

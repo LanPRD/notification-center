@@ -2,7 +2,7 @@ import { UniqueEntityID } from "@/core/entities/unique-entity-id";
 import { NotificationPriority } from "@/domain/enums/notification-priority";
 import { PrismaUserMapper } from "@/infra/database/mappers/prisma-user-mapper";
 import { PrismaService } from "@/infra/database/prisma/prisma.service";
-import type { CreateNotificationDto } from "@/infra/http/dtos/create-notification.dto";
+import type { CreateNotificationBodyDto } from "@/infra/http/dtos/notification.dto";
 import type { INestApplication } from "@nestjs/common";
 import { UserFactory } from "__tests__/factories/user-builder";
 import request from "supertest";
@@ -35,7 +35,7 @@ describe("Create notification (E2E)", () => {
     const externalId = "unique-external-id";
     const idempotencyKey = new UniqueEntityID();
 
-    const body: CreateNotificationDto = {
+    const body: CreateNotificationBodyDto = {
       userId: userCreated.id,
       templateName: "welcome_email",
       content: { firstName: "John", signupDate: "2024-01-01" },
@@ -137,7 +137,7 @@ describe("Create notification (E2E)", () => {
     const externalId = "unique-external-id";
     const idempotencyKey = new UniqueEntityID();
 
-    const body: CreateNotificationDto = {
+    const body: CreateNotificationBodyDto = {
       userId: userCreated.id,
       templateName: "welcome_email",
       content: { firstName: "John", signupDate: "2024-01-01" },

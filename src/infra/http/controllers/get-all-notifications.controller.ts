@@ -1,12 +1,7 @@
 import { GetAllNotificationsByUserIdUseCase } from "@/application/use-cases/notifications/get-all-notifications";
-import { Controller, Get, HttpCode, UsePipes } from "@nestjs/common";
-import { ApiNotFoundResponse, ApiOkResponse, ApiTags } from "@nestjs/swagger";
-import { ZodValidationPipe } from "nestjs-zod";
-import { BaseErrorResponseDto } from "../dtos/error-response.dto";
-import {
-  getNotificationByIdSchema,
-  GetNotificationResponseDto
-} from "../dtos/get-notification-by-id.dto";
+import { Controller, Get, HttpCode } from "@nestjs/common";
+import { ApiOkResponse, ApiOperation, ApiTags } from "@nestjs/swagger";
+import { NotificationDetailsResponseDto } from "../dtos/get-all-notifications.dto";
 import { NotificationPresenter } from "../presenters/notification-presenter";
 
 @Controller()
@@ -16,9 +11,11 @@ export class GetAllNotificationsByUserIdController {
 
   @Get("/notifications")
   @HttpCode(200)
-  @ApiOkResponse({ type: GetNotificationResponseDto })
-  @ApiNotFoundResponse({ type: BaseErrorResponseDto })
-  @UsePipes(new ZodValidationPipe(getNotificationByIdSchema))
+  @ApiOperation({ summary: "Get all notifications with user and logs details" })
+  @ApiOkResponse({
+    description: "Notifications retrieved successfully",
+    type: [NotificationDetailsResponseDto]
+  })
   async handle() {
     const result = await this.useCase.execute();
     return result.map(NotificationPresenter.toHTTPWithDetails);

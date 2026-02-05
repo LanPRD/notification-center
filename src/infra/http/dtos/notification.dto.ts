@@ -3,14 +3,24 @@ import { NotificationStatus } from "@/domain/enums/notification-status";
 import { createZodDto } from "nestjs-zod";
 import { z } from "zod";
 
-export const getNotificationByIdParamSchema = z.object({
-  id: z.uuid("Invalid notification ID format")
+// Request
+export const createNotificationBodySchema = z.object({
+  userId: z.uuid(),
+  templateName: z.string().min(1),
+  content: z.record(z.string(), z.any()),
+  priority: z.enum(NotificationPriority),
+  externalId: z.string().optional()
 });
 
-export class GetNotificationByIdParamDto extends createZodDto(
-  getNotificationByIdParamSchema
+export const idempotencyKeyHeaderSchema = z.object({
+  "idempotency-key": z.uuid()
+});
+
+export class CreateNotificationBodyDto extends createZodDto(
+  createNotificationBodySchema
 ) {}
 
+// Response
 export const notificationResponseSchema = z.object({
   id: z.uuid(),
   externalId: z.string().nullable(),
@@ -22,6 +32,6 @@ export const notificationResponseSchema = z.object({
   createdAt: z.iso.datetime()
 });
 
-export class GetNotificationByIdResponseDto extends createZodDto(
+export class NotificationResponseDto extends createZodDto(
   notificationResponseSchema
 ) {}
