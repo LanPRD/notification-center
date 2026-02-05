@@ -19,19 +19,14 @@ export default [
   },
   {
     rules: {
-      "no-magic-numbers": ["off"]
+      "no-magic-numbers": ["off"],
+      complexity: ["error", 10]
     }
   },
   {
     files: ["**/*-repository.ts"],
     rules: {
       camelcase: "off"
-    }
-  },
-  {
-    files: ["**/use-cases/**/*.ts"],
-    rules: {
-      complexity: ["error", 10]
     }
   }
 ];

@@ -1,4 +1,3 @@
-import { Entity } from "@/core/entities/entity";
 import type { UniqueEntityID } from "@/core/entities/unique-entity-id";
 
 interface UserPreferenceProps {
@@ -8,32 +7,42 @@ interface UserPreferenceProps {
   allowPush: boolean;
 }
 
-export class UserPreference extends Entity<UserPreferenceProps> {
-  public get userId(): UniqueEntityID {
+export class UserPreference {
+  private props: UserPreferenceProps;
+
+  get userId(): UniqueEntityID {
     return this.props.userId;
   }
 
-  public get allowEmail(): boolean {
+  get allowEmail(): boolean {
     return this.props.allowEmail;
   }
 
-  public set allowEmail(allowEmail: boolean) {
+  set allowEmail(allowEmail: boolean) {
     this.props.allowEmail = allowEmail;
   }
 
-  public get allowSMS(): boolean {
+  get allowSMS(): boolean {
     return this.props.allowSMS;
   }
 
-  public set allowSMS(allowSMS: boolean) {
+  set allowSMS(allowSMS: boolean) {
     this.props.allowSMS = allowSMS;
   }
 
-  public get allowPush(): boolean {
+  get allowPush(): boolean {
     return this.props.allowPush;
   }
 
-  public set allowPush(allowPush: boolean) {
+  set allowPush(allowPush: boolean) {
     this.props.allowPush = allowPush;
+  }
+
+  private constructor(props: UserPreferenceProps) {
+    this.props = props;
+  }
+
+  static create(props: UserPreferenceProps): UserPreference {
+    return new UserPreference(props);
   }
 }
