@@ -88,13 +88,6 @@ export class CreateNotificationUseCase {
         );
       }
 
-      const idempotencyKey = IdempotencyKey.create({
-        key: ik,
-        expiresAt: addHours(new Date(), 24)
-      });
-
-      await this.idempotencyKeyRepository.create(idempotencyKey, tx);
-
       const existingNotification =
         await this.notificationRepository.findByUserAndExternalId(
           userId,
@@ -111,6 +104,13 @@ export class CreateNotificationUseCase {
 
         return right({ notification: existingNotification, created: false });
       }
+
+      const idempotencyKey = IdempotencyKey.create({
+        key: ik,
+        expiresAt: addHours(new Date(), 24)
+      });
+
+      await this.idempotencyKeyRepository.create(idempotencyKey, tx);
 
       const notification = Notification.create({
         content,

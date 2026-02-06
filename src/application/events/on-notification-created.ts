@@ -123,7 +123,7 @@ export class OnNotificationCreated {
 
     if (channels.includes("PUSH")) {
       // Send push notification
-      const result = true; // Replace with actual push notification sending logic
+      const result = false; // Replace with actual push notification sending logic
 
       // add log to logs array
       logs.push(

@@ -12,6 +12,7 @@ import {
 import { BaseErrorResponseDto } from "../../dtos/error-response.dto";
 import {
   UpdateUserPrefsBodyDto,
+  updateUserPrefsBodySchema,
   updateUserPrefsParamSchema,
   type UpdateUserPrefsParamDto
 } from "../../dtos/update-user-preferences.dto";
@@ -49,7 +50,8 @@ export class UpdateUserPreferencesController {
   async handle(
     @Param(new ZodValidationPipe(updateUserPrefsParamSchema))
     params: UpdateUserPrefsParamDto,
-    @Body() preferences: UpdateUserPrefsBodyDto
+    @Body(new ZodValidationPipe(updateUserPrefsBodySchema))
+    preferences: UpdateUserPrefsBodyDto
   ): Promise<void> {
     const result = await this.useCase.execute({
       userId: params.userId,
