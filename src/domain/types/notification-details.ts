@@ -1,6 +1,6 @@
-import { NotificationLogStatus } from "@/domain/enums/notification-log-status";
-import { NotificationPriority } from "@/domain/enums/notification-priority";
-import { NotificationStatus } from "@/domain/enums/notification-status";
+import type { NotificationLogStatus } from "@/domain/enums/notification-log-status";
+import type { NotificationPriority } from "@/domain/enums/notification-priority";
+import type { NotificationStatus } from "@/domain/enums/notification-status";
 
 export interface NotificationLogDetails {
   id: string;
@@ -19,7 +19,7 @@ export interface NotificationUserDetails {
 
 export interface NotificationDetails {
   id: string;
-  content: Record<string, any>;
+  content: Record<string, unknown>;
   userId: string;
   externalId: string | null;
   templateName: string;

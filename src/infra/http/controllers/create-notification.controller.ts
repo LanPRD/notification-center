@@ -1,3 +1,4 @@
+import { BadRequestException } from "@/application/errors/bad-request-exception";
 import { CreateNotificationUseCase } from "@/application/use-cases/notifications/create-notification";
 import { Body, Controller, Headers, HttpCode, Post } from "@nestjs/common";
 import {
@@ -11,10 +12,12 @@ import {
   ApiTags
 } from "@nestjs/swagger";
 import { ZodValidationPipe } from "nestjs-zod";
+import { z } from "zod";
 import { BaseErrorResponseDto } from "../dtos/error-response.dto";
 import {
   CreateNotificationBodyDto,
   createNotificationBodySchema,
+  idempotencyKeyHeaderSchema,
   NotificationResponseDto
 } from "../dtos/notification.dto";
 import { NotificationPresenter } from "../presenters/notification-presenter";
@@ -55,7 +58,19 @@ export class CreateNotificationController {
     @Body(new ZodValidationPipe(createNotificationBodySchema))
     body: CreateNotificationBodyDto
   ) {
-    const result = await this.useCase.execute({ input: body, rawHeader });
+    const parsedHeaders = idempotencyKeyHeaderSchema.safeParse(rawHeader);
+
+    if (!parsedHeaders.success) {
+      throw new BadRequestException({
+        message: "Validation failed",
+        issues: z.treeifyError(parsedHeaders.error)
+      });
+    }
+
+    const result = await this.useCase.execute({
+      input: body,
+      headers: parsedHeaders.data
+    });
 
     if (result.isLeft()) {
       throw result.value;

@@ -1,4 +1,4 @@
-import type { NotificationDetails } from "@/application/dtos/notification-details.dto";
+import type { NotificationDetails } from "@/domain/types/notification-details";
 import { NotificationRepository } from "@/domain/repositories/notification-repository";
 import { Injectable } from "@nestjs/common";
 

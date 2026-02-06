@@ -1,4 +1,4 @@
-import type { NotificationDetails } from "@/application/dtos/notification-details.dto";
+import type { NotificationDetails } from "@/domain/types/notification-details";
 import type { Notification } from "@/domain/entities/notification";
 import type { NotificationStatus } from "@/domain/enums/notification-status";
 import type { NotificationRepository } from "@/domain/repositories/notification-repository";

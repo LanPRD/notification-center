@@ -1,8 +1,8 @@
-import type { BaseErrorResponseDto } from "@/infra/http/dtos/error-response.dto";
 import { InternalServerErrorException as InternalNest } from "@nestjs/common";
+import type { ErrorPayload } from "./error-payload";
 
 export class InternalException extends InternalNest {
-  constructor(objectOrError: BaseErrorResponseDto) {
+  constructor(objectOrError: ErrorPayload) {
     super(objectOrError, { description: "Internal Server Error" });
   }
 }

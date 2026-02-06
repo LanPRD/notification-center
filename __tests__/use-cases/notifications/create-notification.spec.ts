@@ -1,3 +1,4 @@
+import { BadRequestException } from "@/application/errors/bad-request-exception";
 import { ConflictException } from "@/application/errors/conflict-exception";
 import { NotFoundException } from "@/application/errors/not-found-exception";
 import { CreateNotificationUseCase } from "@/application/use-cases/notifications/create-notification";
@@ -7,7 +8,6 @@ import { Notification } from "@/domain/entities/notification";
 import { NotificationPriority } from "@/domain/enums/notification-priority";
 import { NotificationStatus } from "@/domain/enums/notification-status";
 import { MESSAGE_PATTERNS } from "@/infra/messaging";
-import { BadRequestException } from "@/application/errors/bad-request-exception";
 import { FakeEventsService } from "__tests__/doubles/fake-events-service";
 import { IkFactory } from "__tests__/factories/ik-builder";
 import { UserFactory } from "__tests__/factories/user-builder";
@@ -69,7 +69,7 @@ describe("Create Notification", () => {
         priority: NotificationPriority.HIGH,
         templateName: "WELCOME_EMAIL"
       },
-      rawHeader: { ["idempotency-key"]: idempotencyKeyHash.toString() }
+      headers: { ["idempotency-key"]: idempotencyKeyHash.toString() }
     });
 
     expect(result.isLeft()).toBe(true);
@@ -96,7 +96,7 @@ describe("Create Notification", () => {
         priority: NotificationPriority.HIGH,
         templateName: "WELCOME_EMAIL"
       },
-      rawHeader: { ["idempotency-key"]: idempotencyKeyHash.toString() }
+      headers: { ["idempotency-key"]: idempotencyKeyHash.toString() }
     });
 
     expect(result.isRight()).toBe(true);
@@ -145,33 +145,12 @@ describe("Create Notification", () => {
           priority: NotificationPriority.HIGH,
           templateName: "WELCOME_EMAIL"
         },
-        rawHeader: { ["idempotency-key"]: new UniqueEntityID().toString() }
+        headers: { ["idempotency-key"]: new UniqueEntityID().toString() }
       })
     ).rejects.toThrow("notification create failed");
 
     expect(idempotencyKeyRepository.idempotencyKeys).toHaveLength(0);
     expect(notificationRepository.notifications).toHaveLength(0);
-  });
-
-  test("it should throw an error if idempotency key isn't a valid UUID", async () => {
-    const content = {
-      title: "New notification",
-      body: "This is a test notification."
-    };
-
-    const result = await sut.execute({
-      input: {
-        content,
-        userId: "user123",
-        externalId: "unique-external-id",
-        priority: NotificationPriority.HIGH,
-        templateName: "WELCOME_EMAIL"
-      },
-      rawHeader: { ["idempotency-key"]: "invalid-idempotency-key" }
-    });
-
-    expect(result.isLeft()).toBe(true);
-    expect(result.value).toBeInstanceOf(BadRequestException);
   });
 
   test("it should throw an error if externalId is missing", async () => {
@@ -188,7 +167,7 @@ describe("Create Notification", () => {
         priority: NotificationPriority.HIGH,
         templateName: "WELCOME_EMAIL"
       },
-      rawHeader: { ["idempotency-key"]: new UniqueEntityID().toString() }
+      headers: { ["idempotency-key"]: new UniqueEntityID().toString() }
     });
 
     expect(result.isLeft()).toBe(true);
@@ -232,7 +211,7 @@ describe("Create Notification", () => {
         priority: NotificationPriority.HIGH,
         templateName: "WELCOME_EMAIL"
       },
-      rawHeader: { ["idempotency-key"]: fakeIk }
+      headers: { ["idempotency-key"]: fakeIk }
     });
 
     expect(result.isRight()).toBe(true);
@@ -258,7 +237,7 @@ describe("Create Notification", () => {
         priority: NotificationPriority.HIGH,
         templateName: "WELCOME_EMAIL"
       },
-      rawHeader: { ["idempotency-key"]: idempotencyKeyHash.toString() }
+      headers: { ["idempotency-key"]: idempotencyKeyHash.toString() }
     });
 
     expect(result.isLeft()).toBe(true);
@@ -296,7 +275,7 @@ describe("Create Notification", () => {
         priority: NotificationPriority.HIGH,
         templateName: "WELCOME_EMAIL"
       },
-      rawHeader: { ["idempotency-key"]: new UniqueEntityID().toString() }
+      headers: { ["idempotency-key"]: new UniqueEntityID().toString() }
     });
 
     expect(result.isRight()).toBe(true);
@@ -318,7 +297,7 @@ describe("Create Notification", () => {
         priority: NotificationPriority.MEDIUM,
         templateName: "WELCOME_EMAIL"
       },
-      rawHeader: { ["idempotency-key"]: new UniqueEntityID().toString() }
+      headers: { ["idempotency-key"]: new UniqueEntityID().toString() }
     });
 
     expect(result.isRight()).toBe(true);
@@ -342,7 +321,7 @@ describe("Create Notification", () => {
         priority: NotificationPriority.LOW,
         templateName: "WELCOME_EMAIL"
       },
-      rawHeader: { ["idempotency-key"]: new UniqueEntityID().toString() }
+      headers: { ["idempotency-key"]: new UniqueEntityID().toString() }
     });
 
     expect(result.isRight()).toBe(true);

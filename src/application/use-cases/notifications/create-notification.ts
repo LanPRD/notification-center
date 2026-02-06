@@ -1,3 +1,7 @@
+import type {
+  CreateNotificationHeadersDto,
+  CreateNotificationInputDto
+} from "@/application/dtos/create-notification-input.dto";
 import { BadRequestException } from "@/application/errors/bad-request-exception";
 import { ConflictException } from "@/application/errors/conflict-exception";
 import { NotFoundException } from "@/application/errors/not-found-exception";
@@ -10,18 +14,13 @@ import { IdempotencyKeyRepository } from "@/domain/repositories/idempotency-key-
 import { NotificationRepository } from "@/domain/repositories/notification-repository";
 import { UnitOfWork } from "@/domain/repositories/unit-of-work";
 import { UserRepository } from "@/domain/repositories/user-repository";
-import {
-  idempotencyKeyHeaderSchema,
-  type CreateNotificationBodyDto
-} from "@/infra/http/dtos/notification.dto";
 import { EventsService, MESSAGE_PATTERNS } from "@/infra/messaging";
 import { Injectable } from "@nestjs/common";
 import { addHours } from "date-fns";
-import { z } from "zod";
 
 interface CreateNotificationInput {
-  input: CreateNotificationBodyDto;
-  rawHeader: Record<string, string>;
+  input: CreateNotificationInputDto;
+  headers: CreateNotificationHeadersDto;
 }
 
 type CreateNotificationUseCaseResponse = Either<
@@ -48,21 +47,10 @@ export class CreateNotificationUseCase {
 
   public async execute({
     input,
-    rawHeader
+    headers
   }: CreateNotificationInput): Promise<CreateNotificationUseCaseResponse> {
     const { content, userId, externalId, priority, templateName } = input;
-    const parsed = idempotencyKeyHeaderSchema.safeParse(rawHeader);
-
-    if (!parsed.success) {
-      return left(
-        new BadRequestException({
-          message: "Validation failed",
-          issues: z.treeifyError(parsed.error)
-        })
-      );
-    }
-
-    const ik = parsed.data["idempotency-key"];
+    const ik = headers["idempotency-key"];
 
     if (!externalId) {
       return left(
