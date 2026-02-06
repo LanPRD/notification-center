@@ -14,8 +14,8 @@ import {
   CancelNotificationParamDto,
   cancelNotificationParamSchema,
   CancelNotificationResponseDto
-} from "../dtos/cancel-notification.dto";
-import { BaseErrorResponseDto } from "../dtos/error-response.dto";
+} from "../../dtos/cancel-notification.dto";
+import { BaseErrorResponseDto } from "../../dtos/error-response.dto";
 
 @Controller()
 @ApiTags("Notifications")

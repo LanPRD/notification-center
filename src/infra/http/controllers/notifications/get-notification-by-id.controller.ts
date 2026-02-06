@@ -9,13 +9,13 @@ import {
   ApiTags
 } from "@nestjs/swagger";
 import { ZodValidationPipe } from "nestjs-zod";
-import { BaseErrorResponseDto } from "../dtos/error-response.dto";
+import { BaseErrorResponseDto } from "../../dtos/error-response.dto";
 import {
   GetNotificationByIdParamDto,
   getNotificationByIdParamSchema,
   GetNotificationByIdResponseDto
-} from "../dtos/get-notification-by-id.dto";
-import { NotificationPresenter } from "../presenters/notification-presenter";
+} from "../../dtos/get-notification-by-id.dto";
+import { NotificationPresenter } from "../../presenters/notification-presenter";
 
 @Controller()
 @ApiTags("Notifications")

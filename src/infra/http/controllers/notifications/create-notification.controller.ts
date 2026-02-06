@@ -13,14 +13,14 @@ import {
 } from "@nestjs/swagger";
 import { ZodValidationPipe } from "nestjs-zod";
 import { z } from "zod";
-import { BaseErrorResponseDto } from "../dtos/error-response.dto";
+import { BaseErrorResponseDto } from "../../dtos/error-response.dto";
 import {
   CreateNotificationBodyDto,
   createNotificationBodySchema,
   idempotencyKeyHeaderSchema,
   NotificationResponseDto
-} from "../dtos/notification.dto";
-import { NotificationPresenter } from "../presenters/notification-presenter";
+} from "../../dtos/notification.dto";
+import { NotificationPresenter } from "../../presenters/notification-presenter";
 
 @Controller("/notifications")
 @ApiTags("Notifications")

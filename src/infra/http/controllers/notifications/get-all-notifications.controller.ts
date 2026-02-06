@@ -1,8 +1,8 @@
 import { GetAllNotificationsByUserIdUseCase } from "@/application/use-cases/notifications/get-all-notifications";
 import { Controller, Get, HttpCode } from "@nestjs/common";
 import { ApiOkResponse, ApiOperation, ApiTags } from "@nestjs/swagger";
-import { NotificationDetailsResponseDto } from "../dtos/get-all-notifications.dto";
-import { NotificationPresenter } from "../presenters/notification-presenter";
+import { NotificationDetailsResponseDto } from "../../dtos/get-all-notifications.dto";
+import { NotificationPresenter } from "../../presenters/notification-presenter";
 
 @Controller()
 @ApiTags("Notifications")

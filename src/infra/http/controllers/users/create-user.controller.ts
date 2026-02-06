@@ -10,13 +10,13 @@ import {
   ApiTags
 } from "@nestjs/swagger";
 import { ZodValidationPipe } from "nestjs-zod";
-import { BaseErrorResponseDto } from "../dtos/error-response.dto";
+import { BaseErrorResponseDto } from "../../dtos/error-response.dto";
 import {
   CreateUserBodyDto,
   createUserBodySchema,
   UserResponseDto
-} from "../dtos/user.dto";
-import { UserPresenter } from "../presenters/user-presenter";
+} from "../../dtos/user.dto";
+import { UserPresenter } from "../../presenters/user-presenter";
 
 @Controller("/users")
 @ApiTags("Users")
