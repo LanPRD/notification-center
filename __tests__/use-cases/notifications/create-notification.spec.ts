@@ -248,6 +248,7 @@ describe("Create Notification", () => {
   test("it should return cached notification if it exists", async () => {
     const user = UserFactory.build();
     const userCreated = await userRepository.create(user);
+    const ik = new UniqueEntityID().toString();
 
     await userRepository.create(user);
 
@@ -265,7 +266,10 @@ describe("Create Notification", () => {
       status: NotificationStatus.PENDING
     });
 
+    const idempotencyKey = IkFactory.build(ik, notification, 201);
+
     await notificationRepository.create(notification);
+    await idempotencyKeyRepository.create(idempotencyKey);
 
     const result = await sut.execute({
       input: {
@@ -275,7 +279,7 @@ describe("Create Notification", () => {
         priority: NotificationPriority.HIGH,
         templateName: "WELCOME_EMAIL"
       },
-      headers: { ["idempotency-key"]: new UniqueEntityID().toString() }
+      headers: { ["idempotency-key"]: ik }
     });
 
     expect(result.isRight()).toBe(true);

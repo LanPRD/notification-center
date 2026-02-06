@@ -53,7 +53,9 @@ export class ProcessSendGridWebhookUseCase {
         this.logger.debug(
           `Skipping event type: ${event.event} for ${event.email}`
         );
+
         skippedCount++;
+
         continue;
       }
 
@@ -62,7 +64,9 @@ export class ProcessSendGridWebhookUseCase {
         this.logger.warn(
           `Event ${event.event} received without notification_id for ${event.email}`
         );
+
         skippedCount++;
+
         continue;
       }
 
@@ -72,7 +76,9 @@ export class ProcessSendGridWebhookUseCase {
 
       if (!notification) {
         this.logger.warn(`Notification not found: ${event.notificationId}`);
+
         skippedCount++;
+
         continue;
       }
 
@@ -84,6 +90,7 @@ export class ProcessSendGridWebhookUseCase {
       this.logger.log(
         `Processed ${event.event} event for notification ${event.notificationId}`
       );
+
       processedCount++;
     }
 
