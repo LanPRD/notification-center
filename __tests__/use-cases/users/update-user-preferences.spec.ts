@@ -1,18 +1,18 @@
 import { InternalException } from "@/application/errors/internal-exception";
 import { NotFoundException } from "@/application/errors/not-found-exception";
-import { UpdateUserPreferenceUseCase } from "@/application/use-cases/users/update-user-preferences";
+import { UpdateUserPreferencesUseCase } from "@/application/use-cases/users/update-user-preferences";
 import { UniqueEntityID } from "@/core/entities/unique-entity-id";
 import { UserPreferenceFactory } from "__tests__/factories/user-preference-builder";
 import { InMemoryUserPreferenceRepository } from "__tests__/repositories/in-memory-user-preference-repository";
 import { vi } from "vitest";
 
 let inMemoryUserPreferenceRepository: InMemoryUserPreferenceRepository;
-let sut: UpdateUserPreferenceUseCase;
+let sut: UpdateUserPreferencesUseCase;
 
 describe("Update User Preferences", () => {
   beforeEach(() => {
     inMemoryUserPreferenceRepository = new InMemoryUserPreferenceRepository();
-    sut = new UpdateUserPreferenceUseCase(inMemoryUserPreferenceRepository);
+    sut = new UpdateUserPreferencesUseCase(inMemoryUserPreferenceRepository);
   });
 
   test("it should update user preference if found", async () => {
