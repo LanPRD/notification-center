@@ -1,5 +1,4 @@
 import { UniqueEntityID } from "@/core/entities/unique-entity-id";
-import type { User } from "@/domain/entities/user";
 import { UserPreference } from "@/domain/entities/user-preference";
 import type {
   Prisma,
@@ -16,9 +15,14 @@ export class PrismaUserPreferenceMapper {
     });
   }
 
-  static toPrisma(user: User): Prisma.UserPreferenceUncheckedCreateInput {
+  static toPrisma(
+    userPref: UserPreference
+  ): Prisma.UserPreferenceUncheckedCreateInput {
     return {
-      userId: user.id.toString()
+      userId: userPref.userId.toString(),
+      allowEmail: userPref.allowEmail,
+      allowSMS: userPref.allowSMS,
+      allowPush: userPref.allowPush
     };
   }
 }

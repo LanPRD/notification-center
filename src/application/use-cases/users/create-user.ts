@@ -61,7 +61,7 @@ export class CreateUserUseCase {
     }
 
     try {
-      await this.userPrefsRepository.register(user);
+      await this.userPrefsRepository.register(userPrefs);
     } catch (_error) {
       return left(
         new InternalException({

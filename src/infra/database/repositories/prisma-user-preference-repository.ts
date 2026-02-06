@@ -1,4 +1,3 @@
-import type { User } from "@/domain/entities/user";
 import type { UserPreference } from "@/domain/entities/user-preference";
 import type { UserPreferenceRepository } from "@/domain/repositories/user-preference-repository";
 import { Injectable } from "@nestjs/common";
@@ -9,9 +8,9 @@ import { PrismaService } from "../prisma/prisma.service";
 export class PrismaUserPreferenceRepository implements UserPreferenceRepository {
   constructor(private readonly prisma: PrismaService) {}
 
-  async register(user: User): Promise<UserPreference> {
+  async register(userPref: UserPreference): Promise<UserPreference> {
     const userPrefs = await this.prisma.userPreference.create({
-      data: PrismaUserPreferenceMapper.toPrisma(user)
+      data: PrismaUserPreferenceMapper.toPrisma(userPref)
     });
 
     return PrismaUserPreferenceMapper.toDomain(userPrefs);

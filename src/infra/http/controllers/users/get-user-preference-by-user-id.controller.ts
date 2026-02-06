@@ -16,12 +16,12 @@ import {
 } from "../../dtos/get-user-preference-by-user-id.dto";
 import { UserPreferencePresenter } from "../../presenters/user-preference-presenter";
 
-@Controller("/users")
+@Controller()
 @ApiTags("Users")
 export class GetUserPreferenceByUserIdController {
   constructor(private readonly useCase: GetUserPreferenceByUserIdUseCase) {}
 
-  @Get()
+  @Get("/users/:userId/preferences")
   @HttpCode(200)
   @ApiOperation({ summary: "Get user preference by user ID" })
   @ApiParam({

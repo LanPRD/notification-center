@@ -22,12 +22,12 @@ import {
 } from "../../dtos/notification.dto";
 import { NotificationPresenter } from "../../presenters/notification-presenter";
 
-@Controller("/notifications")
+@Controller()
 @ApiTags("Notifications")
 export class CreateNotificationController {
   constructor(private readonly useCase: CreateNotificationUseCase) {}
 
-  @Post()
+  @Post("/notifications")
   @HttpCode(201)
   @ApiOperation({ summary: "Create a new notification" })
   @ApiHeader({
