@@ -7,7 +7,8 @@ export const envSchema = z.object({
   RABBITMQ_URL: z.coerce.string().default("amqp://guest:guest@localhost:5672"),
   RABBITMQ_QUEUE_HIGH: z.string().default("notifications.high"),
   RABBITMQ_QUEUE_MEDIUM: z.string().default("notifications.medium"),
-  RABBITMQ_QUEUE_LOW: z.string().default("notifications.low")
+  RABBITMQ_QUEUE_LOW: z.string().default("notifications.low"),
+  SENDGRID_WEBHOOK_VERIFICATION_KEY: z.string().optional()
 });
 
 export type Env = z.infer<typeof envSchema>;

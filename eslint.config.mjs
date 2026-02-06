@@ -20,7 +20,8 @@ export default [
   {
     rules: {
       "no-magic-numbers": ["off"],
-      complexity: ["error", 10]
+      complexity: ["error", 10],
+      camelcase: "off"
     }
   },
   {

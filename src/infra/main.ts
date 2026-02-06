@@ -11,7 +11,8 @@ import { EnvService } from "./env/env.service";
 async function bootstrap() {
   const app = await NestFactory.create<NestFastifyApplication>(
     AppModule,
-    new FastifyAdapter()
+    new FastifyAdapter(),
+    { rawBody: true }
   );
 
   app.setGlobalPrefix("api");
@@ -29,8 +30,6 @@ async function bootstrap() {
   const configService = app.get(EnvService);
   const port = configService.get("PORT");
   const rabbitmqUrl = configService.get("RABBITMQ_URL");
-
-  // Connect RabbitMQ microservices for consuming messages
 
   // HIGH PRIORITY - Processa imediatamente, pega mais mensagens por vez
   app.connectMicroservice<MicroserviceOptions>({
