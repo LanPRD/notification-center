@@ -21,7 +21,7 @@ type UpdateUserPreferenceUseCaseResponse = Either<
 >;
 
 @Injectable()
-export class UpdateUserPreferenceUseCase {
+export class UpdateUserPreferencesUseCase {
   constructor(
     private readonly userPreferenceRepository: UserPreferenceRepository
   ) {}

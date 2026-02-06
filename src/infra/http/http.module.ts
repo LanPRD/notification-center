@@ -5,6 +5,7 @@ import { GetLogsByNotificationIdUseCase } from "@/application/use-cases/notifica
 import { GetNotificationByIdUseCase } from "@/application/use-cases/notifications/get-notification-by-id";
 import { CreateUserUseCase } from "@/application/use-cases/users/create-user";
 import { GetUserPreferenceByUserIdUseCase } from "@/application/use-cases/users/get-user-preference-by-user-id";
+import { UpdateUserPreferencesUseCase } from "@/application/use-cases/users/update-user-preferences";
 import { Module } from "@nestjs/common";
 import { DatabaseModule } from "../database/database.module";
 import { MessagingModule } from "../messaging/messaging.module";
@@ -14,7 +15,8 @@ import { GetAllNotificationsByUserIdController } from "./controllers/notificatio
 import { GetLogsByNotificationIdController } from "./controllers/notifications/get-logs-by-notification-id.controller";
 import { GetNotificationByIdController } from "./controllers/notifications/get-notification-by-id.controller";
 import { CreateUserController } from "./controllers/users/create-user.controller";
-import { GetUserPreferenceByUserIdController } from "./controllers/users/get-user-preference-by-user-id.controller";
+import { GetUserPreferenceByUserIdController } from "./controllers/users/get-user-preferences-by-user-id.controller";
+import { UpdateUserPreferencesController } from "./controllers/users/update-user-preferences.controller";
 
 @Module({
   imports: [DatabaseModule, MessagingModule],
@@ -25,7 +27,8 @@ import { GetUserPreferenceByUserIdController } from "./controllers/users/get-use
     GetLogsByNotificationIdController,
     GetNotificationByIdController,
     CreateUserController,
-    GetUserPreferenceByUserIdController
+    GetUserPreferenceByUserIdController,
+    UpdateUserPreferencesController
   ],
   providers: [
     CancelNotificationUseCase,
@@ -34,7 +37,8 @@ import { GetUserPreferenceByUserIdController } from "./controllers/users/get-use
     GetLogsByNotificationIdUseCase,
     GetNotificationByIdUseCase,
     CreateUserUseCase,
-    GetUserPreferenceByUserIdUseCase
+    GetUserPreferenceByUserIdUseCase,
+    UpdateUserPreferencesUseCase
   ]
 })
 export class HttpModule {}

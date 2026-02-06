@@ -1,6 +1,6 @@
 import { InternalException } from "@/application/errors/internal-exception";
 import { NotFoundException } from "@/application/errors/not-found-exception";
-import { UpdateUserPreferenceUseCase } from "@/application/use-cases/users/update-user-preference";
+import { UpdateUserPreferenceUseCase } from "@/application/use-cases/users/update-user-preferences";
 import { UniqueEntityID } from "@/core/entities/unique-entity-id";
 import { UserPreferenceFactory } from "__tests__/factories/user-preference-builder";
 import { InMemoryUserPreferenceRepository } from "__tests__/repositories/in-memory-user-preference-repository";

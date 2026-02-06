@@ -3,8 +3,8 @@ import { Controller, HttpCode, Param, Patch } from "@nestjs/common";
 import {
   ApiBadRequestResponse,
   ApiConflictResponse,
+  ApiNoContentResponse,
   ApiNotFoundResponse,
-  ApiOkResponse,
   ApiOperation,
   ApiParam,
   ApiTags
@@ -23,7 +23,7 @@ export class CancelNotificationController {
   constructor(private readonly useCase: CancelNotificationUseCase) {}
 
   @Patch("/notifications/:id/cancel")
-  @HttpCode(200)
+  @HttpCode(204)
   @ApiOperation({ summary: "Cancel a pending notification" })
   @ApiParam({
     name: "id",
@@ -31,7 +31,7 @@ export class CancelNotificationController {
     format: "uuid",
     description: "The notification ID"
   })
-  @ApiOkResponse({
+  @ApiNoContentResponse({
     description: "Notification canceled successfully",
     type: CancelNotificationResponseDto
   })
