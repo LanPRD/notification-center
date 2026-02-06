@@ -25,7 +25,11 @@ export class CreateUserController {
 
   @Post()
   @HttpCode(201)
-  @ApiOperation({ summary: "Create a new user" })
+  @ApiOperation({
+    summary: "Create a new user",
+    description:
+      "Creates a new user with the provided information and automatically initializes their notification preferences with default values."
+  })
   @ApiBody({ type: CreateUserBodyDto })
   @ApiCreatedResponse({
     description: "User created successfully",

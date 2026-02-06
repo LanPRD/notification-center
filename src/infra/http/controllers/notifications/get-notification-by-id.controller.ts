@@ -24,7 +24,11 @@ export class GetNotificationByIdController {
 
   @Get("/notifications/:id")
   @HttpCode(200)
-  @ApiOperation({ summary: "Get a notification by ID" })
+  @ApiOperation({
+    summary: "Get a notification by ID",
+    description:
+      "Retrieves a single notification by its unique identifier. Returns the notification details including status, content, and metadata."
+  })
   @ApiParam({
     name: "id",
     type: "string",

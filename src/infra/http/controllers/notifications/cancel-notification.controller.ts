@@ -24,7 +24,11 @@ export class CancelNotificationController {
 
   @Patch("/notifications/:id/cancel")
   @HttpCode(204)
-  @ApiOperation({ summary: "Cancel a pending notification" })
+  @ApiOperation({
+    summary: "Cancel a pending notification",
+    description:
+      "Cancels a notification that is still in PENDING status. Once a notification has been sent or is being processed, it cannot be canceled."
+  })
   @ApiParam({
     name: "id",
     type: "string",

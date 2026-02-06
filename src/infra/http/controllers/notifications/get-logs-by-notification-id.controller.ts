@@ -23,7 +23,11 @@ export class GetLogsByNotificationIdController {
 
   @Get("/notifications/:notificationId/logs")
   @HttpCode(200)
-  @ApiOperation({ summary: "Get all logs for a notification" })
+  @ApiOperation({
+    summary: "Get all logs for a notification",
+    description:
+      "Retrieves the delivery logs for a specific notification. Logs include delivery attempts, status changes, and any error messages from the delivery process."
+  })
   @ApiParam({
     name: "notificationId",
     type: "string",

@@ -9,6 +9,8 @@ import {
 } from "@nestjs/common";
 import {
   ApiBadRequestResponse,
+  ApiBody,
+  ApiHeader,
   ApiOkResponse,
   ApiOperation,
   ApiTags,
@@ -36,7 +38,47 @@ export class SendGridWebhookController {
   @ApiOperation({
     summary: "Receive SendGrid email events",
     description:
-      "Webhook endpoint that receives email delivery events from SendGrid (delivered, bounced, opened, etc.)"
+      "Webhook endpoint that receives email delivery events from SendGrid. Events include: delivered, bounced, opened, clicked, spam reports, and unsubscribes. The endpoint validates the webhook signature before processing."
+  })
+  @ApiHeader({
+    name: "x-twilio-email-event-webhook-signature",
+    required: true,
+    description: "ECDSA signature for webhook payload verification"
+  })
+  @ApiHeader({
+    name: "x-twilio-email-event-webhook-timestamp",
+    required: true,
+    description: "Timestamp used in signature generation"
+  })
+  @ApiBody({
+    type: SendGridWebhookBodyDto,
+    description: "Array of SendGrid event objects",
+    examples: {
+      delivered: {
+        summary: "Email delivered event",
+        value: [
+          {
+            email: "user@example.com",
+            timestamp: 1234567890,
+            event: "delivered",
+            sg_message_id: "abc123",
+            notification_id: "550e8400-e29b-41d4-a716-446655440000"
+          }
+        ]
+      },
+      bounce: {
+        summary: "Email bounced event",
+        value: [
+          {
+            email: "user@example.com",
+            timestamp: 1234567890,
+            event: "bounce",
+            reason: "550 User not found",
+            notification_id: "550e8400-e29b-41d4-a716-446655440000"
+          }
+        ]
+      }
+    }
   })
   @ApiOkResponse({
     description: "Events processed successfully",

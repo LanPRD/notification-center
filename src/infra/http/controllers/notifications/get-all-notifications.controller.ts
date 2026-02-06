@@ -11,7 +11,11 @@ export class GetAllNotificationsByUserIdController {
 
   @Get("/notifications")
   @HttpCode(200)
-  @ApiOperation({ summary: "Get all notifications with user and logs details" })
+  @ApiOperation({
+    summary: "Get all notifications with user and logs details",
+    description:
+      "Retrieves all notifications in the system with their associated user information and delivery logs. Returns an array of notifications sorted by creation date."
+  })
   @ApiOkResponse({
     description: "Notifications retrieved successfully",
     type: [NotificationDetailsResponseDto]

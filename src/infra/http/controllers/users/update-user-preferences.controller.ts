@@ -1,6 +1,7 @@
 import { UpdateUserPreferencesUseCase } from "@/application/use-cases/users/update-user-preferences";
 import { Body, Controller, HttpCode, Param, Put } from "@nestjs/common";
 import {
+  ApiBadRequestResponse,
   ApiBody,
   ApiInternalServerErrorResponse,
   ApiNoContentResponse,
@@ -25,7 +26,11 @@ export class UpdateUserPreferencesController {
 
   @Put("/users/:userId/preferences")
   @HttpCode(204)
-  @ApiOperation({ summary: "Update user preferences by user ID" })
+  @ApiOperation({
+    summary: "Update user preferences by user ID",
+    description:
+      "Updates the notification preferences for a specific user. Allows changing preferred channels (email, SMS, push) and quiet hours settings."
+  })
   @ApiBody({
     type: UpdateUserPrefsBodyDto,
     description: "User preferences to update"
@@ -38,6 +43,10 @@ export class UpdateUserPreferencesController {
   })
   @ApiNoContentResponse({
     description: "User preferences updated successfully"
+  })
+  @ApiBadRequestResponse({
+    description: "Invalid user ID format or invalid preferences data",
+    type: BaseErrorResponseDto
   })
   @ApiNotFoundResponse({
     description: "User preferences not found",

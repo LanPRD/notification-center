@@ -29,7 +29,11 @@ export class CreateNotificationController {
 
   @Post("/notifications")
   @HttpCode(201)
-  @ApiOperation({ summary: "Create a new notification" })
+  @ApiOperation({
+    summary: "Create a new notification",
+    description:
+      "Creates a notification for a user and queues it for delivery based on priority. Requires an idempotency key header to prevent duplicate requests. The notification will be processed asynchronously."
+  })
   @ApiHeader({
     name: "Idempotency-Key",
     required: true,

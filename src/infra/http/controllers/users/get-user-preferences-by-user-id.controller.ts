@@ -1,6 +1,7 @@
 import { GetUserPreferenceByUserIdUseCase } from "@/application/use-cases/users/get-user-preference-by-user-id";
 import { Controller, Get, HttpCode, Param } from "@nestjs/common";
 import {
+  ApiBadRequestResponse,
   ApiNotFoundResponse,
   ApiOkResponse,
   ApiOperation,
@@ -23,7 +24,11 @@ export class GetUserPreferenceByUserIdController {
 
   @Get("/users/:userId/preferences")
   @HttpCode(200)
-  @ApiOperation({ summary: "Get user preference by user ID" })
+  @ApiOperation({
+    summary: "Get user preferences by user ID",
+    description:
+      "Retrieves the notification preferences for a specific user, including their preferred channels (email, SMS, push) and quiet hours settings."
+  })
   @ApiParam({
     name: "userId",
     type: "string",
@@ -31,11 +36,15 @@ export class GetUserPreferenceByUserIdController {
     description: "The user ID"
   })
   @ApiOkResponse({
-    description: "User preference retrieved successfully",
+    description: "User preferences retrieved successfully",
     type: GetUserPreferenceByUserIdResponseDto
   })
+  @ApiBadRequestResponse({
+    description: "Invalid user ID format",
+    type: BaseErrorResponseDto
+  })
   @ApiNotFoundResponse({
-    description: "User not found",
+    description: "User preferences not found",
     type: BaseErrorResponseDto
   })
   async handle(
