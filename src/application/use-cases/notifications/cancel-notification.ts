@@ -1,12 +1,14 @@
 import { ConflictException } from "@/application/errors/conflict-exception";
+import { InternalException } from "@/application/errors/internal-exception";
 import { NotFoundException } from "@/application/errors/not-found-exception";
 import { left, right, type Either } from "@/core/either";
 import { NotificationStatus } from "@/domain/enums/notification-status";
 import { NotificationRepository } from "@/domain/repositories/notification-repository";
-import { Injectable } from "@nestjs/common";
+import { EventsService, MESSAGE_PATTERNS } from "@/infra/messaging";
+import { Injectable, Logger } from "@nestjs/common";
 
 type CancelNotificationUseCaseResponse = Either<
-  NotFoundException | ConflictException,
+  NotFoundException | ConflictException | InternalException,
   {
     id: string;
     status: "CANCELED";
@@ -16,8 +18,11 @@ type CancelNotificationUseCaseResponse = Either<
 
 @Injectable()
 export class CancelNotificationUseCase {
+  private readonly logger = new Logger(CancelNotificationUseCase.name);
+
   constructor(
-    private readonly notificationRepository: NotificationRepository
+    private readonly notificationRepository: NotificationRepository,
+    private readonly eventsService: EventsService
   ) {}
 
   public async execute(id: string): Promise<CancelNotificationUseCaseResponse> {
@@ -38,7 +43,22 @@ export class CancelNotificationUseCase {
 
     notification.status = NotificationStatus.CANCELED;
 
-    await this.notificationRepository.update(notification);
+    try {
+      await this.notificationRepository.update(notification);
+    } catch (_error) {
+      return left(
+        new InternalException({ message: "Failed to cancel notification" })
+      );
+    }
+
+    await this.eventsService
+      .emitLow(
+        MESSAGE_PATTERNS.NOTIFICATION_CANCELED,
+        notification.id.toString()
+      )
+      .catch(err =>
+        this.logger.error("Failed to emit notification canceled event", err)
+      );
 
     return right({
       id: notification.id.toString(),

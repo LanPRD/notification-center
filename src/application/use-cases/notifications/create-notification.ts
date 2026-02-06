@@ -15,7 +15,7 @@ import { NotificationRepository } from "@/domain/repositories/notification-repos
 import { UnitOfWork } from "@/domain/repositories/unit-of-work";
 import { UserRepository } from "@/domain/repositories/user-repository";
 import { EventsService, MESSAGE_PATTERNS } from "@/infra/messaging";
-import { Injectable } from "@nestjs/common";
+import { Injectable, Logger } from "@nestjs/common";
 import { addHours } from "date-fns";
 
 interface CreateNotificationInput {
@@ -37,6 +37,8 @@ type TxEither = Either<
 
 @Injectable()
 export class CreateNotificationUseCase {
+  private readonly logger = new Logger(CreateNotificationUseCase.name);
+
   constructor(
     private readonly idempotencyKeyRepository: IdempotencyKeyRepository,
     private readonly notificationRepository: NotificationRepository,
@@ -138,7 +140,9 @@ export class CreateNotificationUseCase {
     if (result.isLeft()) return left(result.value);
 
     if (result.value.created) {
-      await this.emitEvent(result.value.notification);
+      await this.emitEvent(result.value.notification).catch(err =>
+        this.logger.error("Failed to emit notification event", err)
+      );
     }
 
     return right({ notification: result.value.notification });

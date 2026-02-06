@@ -8,6 +8,8 @@ import { NotificationLogRepository } from "@/domain/repositories/notification-lo
 import { NotificationRepository } from "@/domain/repositories/notification-repository";
 import { UserPreferenceRepository } from "@/domain/repositories/user-preference-repository";
 import { UserRepository } from "@/domain/repositories/user-repository";
+import { MESSAGE_PATTERNS } from "@/infra/messaging/constants";
+import { EventsService } from "@/infra/messaging/publishers/events.service";
 import { Injectable, Logger } from "@nestjs/common";
 
 interface OnNotificationCreatedInput {
@@ -23,7 +25,8 @@ export class OnNotificationCreated {
     private readonly notificationLogsRepository: NotificationLogRepository,
     private readonly notificationRepository: NotificationRepository,
     private readonly userPrefRepository: UserPreferenceRepository,
-    private readonly userRepository: UserRepository
+    private readonly userRepository: UserRepository,
+    private readonly eventsService: EventsService
   ) {}
 
   async execute(props: OnNotificationCreatedInput): Promise<void> {
@@ -56,6 +59,11 @@ export class OnNotificationCreated {
     await this.notificationLogsRepository.createMany(logs);
 
     const finalStatus = this.calculateFinalStatus(logs);
+
+    await this.emitEvent(notificationId, finalStatus).catch(err =>
+      this.logger.error("Failed to emit event", err)
+    );
+
     await this.notificationRepository.updateStatus(notificationId, finalStatus);
   }
 
@@ -160,5 +168,24 @@ export class OnNotificationCreated {
     }
 
     return NotificationStatus.SENT;
+  }
+
+  private async emitEvent(notificationId: string, status: NotificationStatus) {
+    if (status === NotificationStatus.PARTIAL) {
+      await this.eventsService.emitLow(
+        MESSAGE_PATTERNS.NOTIFICATION_PARTIAL,
+        notificationId
+      );
+    } else if (status === NotificationStatus.FAILED) {
+      await this.eventsService.emitLow(
+        MESSAGE_PATTERNS.NOTIFICATION_FAILED,
+        notificationId
+      );
+    } else if (status === NotificationStatus.SENT) {
+      await this.eventsService.emitLow(
+        MESSAGE_PATTERNS.NOTIFICATION_SENT,
+        notificationId
+      );
+    }
   }
 }

@@ -1,5 +1,6 @@
 import { Inject, Injectable, Logger } from "@nestjs/common";
 import type { ClientProxy } from "@nestjs/microservices";
+import type { MessagePattern } from "../constants";
 
 @Injectable()
 export class EventsService {
@@ -14,11 +15,11 @@ export class EventsService {
     private readonly lowPriorityClient: ClientProxy
   ) {}
 
-  async emit(pattern: string, data: any): Promise<void> {
+  async emit(pattern: MessagePattern, data: any): Promise<void> {
     await this.emitMedium(pattern, data);
   }
 
-  async emitHigh(pattern: string, data: any): Promise<void> {
+  async emitHigh(pattern: MessagePattern, data: any): Promise<void> {
     try {
       this.highPriorityClient.emit(pattern, data);
       this.logger.log(
@@ -30,7 +31,7 @@ export class EventsService {
     }
   }
 
-  async emitMedium(pattern: string, data: any): Promise<void> {
+  async emitMedium(pattern: MessagePattern, data: any): Promise<void> {
     try {
       this.mediumPriorityClient.emit(pattern, data);
       this.logger.log(
@@ -45,7 +46,7 @@ export class EventsService {
     }
   }
 
-  async emitLow(pattern: string, data: any): Promise<void> {
+  async emitLow(pattern: MessagePattern, data: any): Promise<void> {
     try {
       this.lowPriorityClient.emit(pattern, data);
       this.logger.log(

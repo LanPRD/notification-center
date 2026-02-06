@@ -3,6 +3,7 @@ import { Either, right } from "@/core/either";
 import { NotificationLogStatus } from "@/domain/enums/notification-log-status";
 import { NotificationLogRepository } from "@/domain/repositories/notification-log-repository";
 import { NotificationRepository } from "@/domain/repositories/notification-repository";
+import { EventsService } from "@/infra/messaging/publishers/events.service";
 import { Injectable, Logger } from "@nestjs/common";
 
 const EVENT_STATUS_MAP: Record<string, NotificationLogStatus | null> = {
@@ -33,8 +34,9 @@ export class ProcessSendGridWebhookUseCase {
   private readonly logger = new Logger(ProcessSendGridWebhookUseCase.name);
 
   constructor(
+    private readonly notificationLogRepository: NotificationLogRepository,
     private readonly notificationRepository: NotificationRepository,
-    private readonly notificationLogRepository: NotificationLogRepository
+    private readonly eventsService: EventsService
   ) {}
 
   async execute(
@@ -77,6 +79,7 @@ export class ProcessSendGridWebhookUseCase {
       // 1. Create a new notification log entry
       // 2. Update notification status if needed
       // 3. Trigger any follow-up actions (retry, alert, etc.)
+      // await this.eventsService.emitMedium("", {});
 
       this.logger.log(
         `Processed ${event.event} event for notification ${event.notificationId}`

@@ -3,6 +3,7 @@ import { Controller, HttpCode, Param, Patch } from "@nestjs/common";
 import {
   ApiBadRequestResponse,
   ApiConflictResponse,
+  ApiInternalServerErrorResponse,
   ApiNoContentResponse,
   ApiNotFoundResponse,
   ApiOperation,
@@ -49,6 +50,10 @@ export class CancelNotificationController {
   })
   @ApiConflictResponse({
     description: "Notification is not in PENDING state",
+    type: BaseErrorResponseDto
+  })
+  @ApiInternalServerErrorResponse({
+    description: "Failed to create notification",
     type: BaseErrorResponseDto
   })
   async handle(
