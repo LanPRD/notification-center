@@ -8,7 +8,7 @@ import { PrismaNotificationLogFactory } from "__tests__/factories/notification-l
 import { PrismaUserFactory } from "__tests__/factories/user-builder";
 import request from "supertest";
 
-describe("Cancel notification (E2E)", () => {
+describe("Get logs by notification ID (E2E)", () => {
   let app: INestApplication;
   let prisma: PrismaService;
   let prismaUserFactory: PrismaUserFactory;
@@ -62,6 +62,14 @@ describe("Cancel notification (E2E)", () => {
 
     expect(response.status).toBe(200);
     expect(response.body[0].id).toEqual(log.id.toString());
+  });
+
+  test("[GET] /notifications/:notificationId/logs with invalid notificationId", async () => {
+    const response = await request(app.getHttpServer()).get(
+      "/notifications/invalid/logs"
+    );
+
+    expect(response.status).toBe(400);
   });
 
   afterAll(async () => {
