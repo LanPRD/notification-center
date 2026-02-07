@@ -237,6 +237,9 @@ npx prisma migrate deploy
 npm run start:dev
 ```
 
+> O arquivo `.env` já está incluso no repositório com credenciais de
+> desenvolvimento local, facilitando a execução do projeto.
+
 ## Scripts
 
 | Comando                    | Descrição                                     |
@@ -265,4 +268,6 @@ __tests__/
 
 ## Anotações Técnicas
 
-A pasta `docs/` contém anotações que fiz durante o desenvolvimento sobre alguns dos conceitos aplicados no projeto, como estratégias de priorização no RabbitMQ, Value Objects, testes E2E, entre outros.
+A pasta `docs/` contém anotações que fiz durante o desenvolvimento sobre alguns
+dos conceitos aplicados no projeto, como estratégias de priorização no RabbitMQ,
+Value Objects, testes E2E, entre outros.
