@@ -68,8 +68,6 @@ describe("Create user (E2E)", () => {
       pushToken: "test-token"
     });
 
-    console.log(response.body);
-
     expect(response.status).toBe(400);
     expect(response.body).toHaveProperty("message");
   });

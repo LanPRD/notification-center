@@ -89,7 +89,7 @@ describe("Create notification (E2E)", () => {
       return acc;
     }, {});
 
-    console.log("By status:", byStatus);
+    // console.log("By status:", byStatus);
 
     const notificationCount = await prisma.notification.count({
       where: {
@@ -106,6 +106,32 @@ describe("Create notification (E2E)", () => {
 
     expect(notificationCount).toBe(1);
     expect(ikCount).toBe(1);
+  });
+
+  test("[POST] /notification with invalid template name", async () => {
+    const user = UserFactory.build();
+
+    const userCreated = await prisma.user.create({
+      data: PrismaUserMapper.toPrisma(user)
+    });
+
+    const idempotencyKey = new UniqueEntityID();
+
+    const body: CreateNotificationBodyDto = {
+      userId: userCreated.id,
+      templateName: "INVALID_TEMPLATE_NAME",
+      content: { firstName: "John", signupDate: "2024-01-01" },
+      priority: NotificationPriority.HIGH,
+      externalId: "unique-external-id"
+    };
+
+    const result = await request(app.getHttpServer())
+      .post("/notifications")
+      .set("Idempotency-Key", idempotencyKey.toString())
+      .send(body);
+
+    expect(result.status).toBe(400);
+    expect(result.body.message).toContain("Invalid template name");
   });
 
   afterAll(async () => {
