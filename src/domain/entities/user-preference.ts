@@ -1,6 +1,6 @@
 import type { UniqueEntityID } from "@/core/entities/unique-entity-id";
 
-interface UserPreferenceProps {
+export interface UserPreferenceProps {
   userId: UniqueEntityID;
   allowEmail: boolean;
   allowSMS: boolean;

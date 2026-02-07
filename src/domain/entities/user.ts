@@ -1,7 +1,7 @@
 import { Entity } from "@/core/entities/entity";
 import type { UniqueEntityID } from "@/core/entities/unique-entity-id";
 
-interface UserProps {
+export interface UserProps {
   email: string;
   phoneNumber?: string | null;
   pushToken?: string | null;

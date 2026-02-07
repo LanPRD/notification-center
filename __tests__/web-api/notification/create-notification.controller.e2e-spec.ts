@@ -98,27 +98,6 @@ describe("Create notification (E2E)", () => {
     expect(ikCount).toBe(1);
   });
 
-  // test("[POST] /notifications race: same externalId, different idempotency keys", async () => {
-  //   const { body, userCreated: user, idempotencyKey } = await prepareToTest();
-
-  //   const server = app.getHttpServer();
-
-  //   const calls = Array.from({ length: 30 }, (_, i) =>
-  //     request(server)
-  //       .post("/notifications")
-  //       .set("Idempotency-Key", new UniqueEntityID().toString()) // só pra variar
-  //       .send(body)
-  //   );
-
-  //   const results = await Promise.all(calls);
-
-  //   const notifCount = await prisma.notification.count({
-  //     where: { userId: user.id, externalId: body.externalId }
-  //   });
-
-  //   expect(notifCount).toBe(1);
-  // });
-
   afterAll(async () => {
     await app.close();
   });
