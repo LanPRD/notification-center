@@ -24,6 +24,7 @@ export class PrismaNotificationLogMapper {
     log: NotificationLog
   ): Prisma.NotificationLogUncheckedCreateInput {
     return {
+      id: log.id.toString(),
       channel: log.channel,
       status: log.status,
       errorMessage: log.errorMessage,

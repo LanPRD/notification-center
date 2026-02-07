@@ -9,23 +9,23 @@ export interface UserProps {
 }
 
 export class User extends Entity<UserProps> {
-  public get email(): string {
+  get email(): string {
     return this.props.email;
   }
 
-  public get phoneNumber(): PhoneNumber | null {
+  get phoneNumber(): PhoneNumber | null {
     return this.props.phoneNumber ?? null;
   }
 
-  public set phoneNumber(phoneNumber: PhoneNumber | null) {
+  set phoneNumber(phoneNumber: PhoneNumber | null) {
     this.props.phoneNumber = phoneNumber;
   }
 
-  public get pushToken(): string | null {
+  get pushToken(): string | null {
     return this.props.pushToken ?? null;
   }
 
-  public set pushToken(pushToken: string | null) {
+  set pushToken(pushToken: string | null) {
     this.props.pushToken = pushToken;
   }
 

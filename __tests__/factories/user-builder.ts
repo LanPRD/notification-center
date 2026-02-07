@@ -12,10 +12,10 @@ export class UserFactory {
       {
         email: faker.internet.email(),
         phoneNumber: UserFactory.generateValidPhone(),
-        pushToken: faker.string.uuid(),
+        pushToken: new UniqueEntityID().toString(),
         ...data
       },
-      id ?? new UniqueEntityID(faker.string.uuid())
+      id ?? new UniqueEntityID()
     );
   }
 
