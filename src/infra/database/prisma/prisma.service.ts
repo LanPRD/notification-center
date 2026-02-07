@@ -24,7 +24,7 @@ export class PrismaService
     );
 
     super({
-      log: ["query", "warn", "error"],
+      log: ["warn", "error"],
       adapter
     });
   }
