@@ -29,6 +29,10 @@ describe("Create user (E2E)", () => {
     await app.init();
   });
 
+  beforeEach(async () => {
+    await prisma.user.deleteMany();
+  });
+
   test("[POST] /user", async () => {
     const email = "test@example.com";
 
@@ -44,6 +48,30 @@ describe("Create user (E2E)", () => {
     const userOnDatabase = await prisma.user.findUnique({ where: { email } });
 
     expect(userOnDatabase).toBeTruthy();
+  });
+
+  test("[POST] /user with invalid email", async () => {
+    const response = await request(app.getHttpServer()).post("/users").send({
+      email: "invalid_email",
+      phoneNumber: "+1234567890",
+      pushToken: "test-token"
+    });
+
+    expect(response.status).toBe(400);
+    expect(response.body).toHaveProperty("message", "Validation failed");
+  });
+
+  test("[POST] /user with invalid phone number", async () => {
+    const response = await request(app.getHttpServer()).post("/users").send({
+      email: "test@example.com",
+      phoneNumber: "invalid_phone_number",
+      pushToken: "test-token"
+    });
+
+    console.log(response.body);
+
+    expect(response.status).toBe(400);
+    expect(response.body).toHaveProperty("message");
   });
 
   afterAll(async () => {
