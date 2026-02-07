@@ -5,6 +5,7 @@ import { PrismaService } from "@/infra/database/prisma/prisma.service";
 import type { CreateNotificationBodyDto } from "@/infra/http/dtos/notification.dto";
 import { EventsService } from "@/infra/messaging/publishers/events.service";
 import type { INestApplication } from "@nestjs/common";
+import { NotificationFactory } from "__tests__/factories/notification-builder";
 import { UserFactory } from "__tests__/factories/user-builder";
 import request from "supertest";
 
@@ -46,7 +47,7 @@ describe("Create notification (E2E)", () => {
 
     const body: CreateNotificationBodyDto = {
       userId: userCreated.id,
-      templateName: "welcome_email",
+      templateName: NotificationFactory.generateValidTemplateName().value,
       content: { firstName: "John", signupDate: "2024-01-01" },
       priority: NotificationPriority.HIGH,
       externalId: externalId
@@ -127,7 +128,7 @@ describe("Create notification (E2E)", () => {
 
     const body: CreateNotificationBodyDto = {
       userId: userCreated.id,
-      templateName: "welcome_email",
+      templateName: NotificationFactory.generateValidTemplateName().value,
       content: { firstName: "John", signupDate: "2024-01-01" },
       priority: NotificationPriority.HIGH,
       externalId: externalId
