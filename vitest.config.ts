@@ -19,7 +19,8 @@ export default defineConfig({
         "/node_modules/**",
         "**/dtos/**",
         "**/infra/http/**",
-        "**/infra/database/**"
+        "**/infra/database/**",
+        "**/domain/repositories/**"
       ]
     }
   },
