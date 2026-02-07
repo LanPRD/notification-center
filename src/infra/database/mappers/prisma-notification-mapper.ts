@@ -38,6 +38,7 @@ export class PrismaNotificationMapper {
     notification: Notification
   ): Prisma.NotificationUncheckedCreateInput {
     return {
+      id: notification.id.toString(),
       content: notification.content,
       externalId: notification.externalId,
       templateName: notification.templateName.value,

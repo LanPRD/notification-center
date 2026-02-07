@@ -4,8 +4,8 @@ import {
   ApiBadRequestResponse,
   ApiConflictResponse,
   ApiInternalServerErrorResponse,
-  ApiNoContentResponse,
   ApiNotFoundResponse,
+  ApiOkResponse,
   ApiOperation,
   ApiParam,
   ApiTags
@@ -24,7 +24,7 @@ export class CancelNotificationController {
   constructor(private readonly useCase: CancelNotificationUseCase) {}
 
   @Patch("/notifications/:id/cancel")
-  @HttpCode(204)
+  @HttpCode(200)
   @ApiOperation({
     summary: "Cancel a pending notification",
     description:
@@ -36,7 +36,7 @@ export class CancelNotificationController {
     format: "uuid",
     description: "The notification ID"
   })
-  @ApiNoContentResponse({
+  @ApiOkResponse({
     description: "Notification canceled successfully",
     type: CancelNotificationResponseDto
   })

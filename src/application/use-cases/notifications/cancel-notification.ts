@@ -56,8 +56,9 @@ export class CancelNotificationUseCase {
         MESSAGE_PATTERNS.NOTIFICATION_CANCELED,
         notification.id.toString()
       )
-      .catch(err =>
-        this.logger.error("Failed to emit notification canceled event", err)
+      .catch(
+        _err => {}
+        // this.logger.error("Failed to emit notification canceled event", err)
       );
 
     return right({

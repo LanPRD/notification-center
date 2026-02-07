@@ -1,4 +1,5 @@
 import { ConflictException } from "@/application/errors/conflict-exception";
+import { InternalException } from "@/application/errors/internal-exception";
 import { NotFoundException } from "@/application/errors/not-found-exception";
 import { CancelNotificationUseCase } from "@/application/use-cases/notifications/cancel-notification";
 import { UniqueEntityID } from "@/core/entities/unique-entity-id";
@@ -47,5 +48,20 @@ describe("Cancel Notification", () => {
 
     expect(result.isLeft()).toBe(true);
     expect(result.value).instanceOf(ConflictException);
+  });
+
+  it("should return InternalException if update fails", async () => {
+    const notification = NotificationFactory.build();
+
+    await notificationRepository.create(notification);
+
+    vi.spyOn(notificationRepository, "update").mockRejectedValueOnce(
+      new Error("Database connection failed")
+    );
+
+    const result = await sut.execute(notification.id.toString());
+
+    expect(result.isLeft()).toBe(true);
+    expect(result.value).toBeInstanceOf(InternalException);
   });
 });

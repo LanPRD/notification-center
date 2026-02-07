@@ -25,10 +25,10 @@ describe("Get user preference by user id (E2E)", () => {
     })
       .overrideProvider(EventsService)
       .useValue({
-        emit: vi.fn(),
-        emitHigh: vi.fn(),
-        emitMedium: vi.fn(),
-        emitLow: vi.fn()
+        emit: vi.fn().mockResolvedValue(undefined),
+        emitHigh: vi.fn().mockResolvedValue(undefined),
+        emitMedium: vi.fn().mockResolvedValue(undefined),
+        emitLow: vi.fn().mockResolvedValue(undefined)
       })
       .compile();
 

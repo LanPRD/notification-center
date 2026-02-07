@@ -5,7 +5,7 @@ import type { NotificationPriority } from "../enums/notification-priority";
 import type { NotificationStatus } from "../enums/notification-status";
 import type { TemplateName } from "@/domain/value-objects/template-name";
 
-interface NotificationProps {
+export interface NotificationProps {
   content: any;
   userId: UniqueEntityID;
   externalId: string | null;
