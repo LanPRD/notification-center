@@ -14,6 +14,7 @@ import { IdempotencyKeyRepository } from "@/domain/repositories/idempotency-key-
 import { NotificationRepository } from "@/domain/repositories/notification-repository";
 import { UnitOfWork } from "@/domain/repositories/unit-of-work";
 import { UserRepository } from "@/domain/repositories/user-repository";
+import { TemplateName } from "@/domain/value-objects/template-name";
 import { EventsService, MESSAGE_PATTERNS } from "@/infra/messaging";
 import { Injectable, Logger } from "@nestjs/common";
 import { addHours } from "date-fns";
@@ -61,6 +62,18 @@ export class CreateNotificationUseCase {
         })
       );
     }
+
+    const templateNameOrError = TemplateName.create(templateName);
+
+    if (templateNameOrError.isLeft()) {
+      return left(
+        new BadRequestException({
+          message: templateNameOrError.value.message
+        })
+      );
+    }
+
+    const validatedTemplateName = templateNameOrError.value;
 
     const userExists = await this.userRepository.findById(userId);
 
@@ -120,7 +133,7 @@ export class CreateNotificationUseCase {
         externalId,
         priority,
         status: NotificationStatus.PENDING,
-        templateName
+        templateName: validatedTemplateName
       });
 
       const created = await this.notificationRepository.create(

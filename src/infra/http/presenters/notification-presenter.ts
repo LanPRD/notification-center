@@ -10,7 +10,7 @@ export class NotificationPresenter {
       createdAt: notification.createdAt,
       userId: notification.userId.toString(),
       externalId: notification.externalId,
-      templateName: notification.templateName,
+      templateName: notification.templateName.value,
       content: notification.content
     };
   }

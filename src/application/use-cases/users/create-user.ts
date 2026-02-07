@@ -1,3 +1,4 @@
+import { BadRequestException } from "@/application/errors/bad-request-exception";
 import { ConflictException } from "@/application/errors/conflict-exception";
 import { InternalException } from "@/application/errors/internal-exception";
 import { left, right, type Either } from "@/core/either";
@@ -5,6 +6,7 @@ import { User } from "@/domain/entities/user";
 import { UserPreference } from "@/domain/entities/user-preference";
 import { UserPreferenceRepository } from "@/domain/repositories/user-preference-repository";
 import { UserRepository } from "@/domain/repositories/user-repository";
+import { PhoneNumber } from "@/domain/value-objects/phone-number";
 import type { CreateUserInputDto } from "@/application/dtos/create-user-input.dto";
 import { Injectable } from "@nestjs/common";
 
@@ -13,7 +15,7 @@ interface CreateUserInput {
 }
 
 type CreateUserUseCaseResponse = Either<
-  ConflictException | InternalException,
+  BadRequestException | ConflictException | InternalException,
   {
     user: User;
     userPrefs: UserPreference;
@@ -42,7 +44,27 @@ export class CreateUserUseCase {
       );
     }
 
-    const user = User.create({ email, phoneNumber, pushToken });
+    let validatedPhoneNumber: PhoneNumber | null = null;
+
+    if (phoneNumber) {
+      const phoneOrError = PhoneNumber.create(phoneNumber);
+
+      if (phoneOrError.isLeft()) {
+        return left(
+          new BadRequestException({
+            message: phoneOrError.value.message
+          })
+        );
+      }
+
+      validatedPhoneNumber = phoneOrError.value;
+    }
+
+    const user = User.create({
+      email,
+      phoneNumber: validatedPhoneNumber,
+      pushToken
+    });
     const userPrefs = UserPreference.create({
       userId: user.id,
       allowEmail: true,

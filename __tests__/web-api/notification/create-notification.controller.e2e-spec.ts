@@ -3,6 +3,7 @@ import { NotificationPriority } from "@/domain/enums/notification-priority";
 import { PrismaUserMapper } from "@/infra/database/mappers/prisma-user-mapper";
 import { PrismaService } from "@/infra/database/prisma/prisma.service";
 import type { CreateNotificationBodyDto } from "@/infra/http/dtos/notification.dto";
+import { EventsService } from "@/infra/messaging/publishers/events.service";
 import type { INestApplication } from "@nestjs/common";
 import { UserFactory } from "__tests__/factories/user-builder";
 import request from "supertest";
@@ -17,7 +18,15 @@ describe("Create notification (E2E)", () => {
 
     const moduleRef = await Test.createTestingModule({
       imports: [AppModule]
-    }).compile();
+    })
+      .overrideProvider(EventsService)
+      .useValue({
+        emit: vi.fn(),
+        emitHigh: vi.fn(),
+        emitMedium: vi.fn(),
+        emitLow: vi.fn()
+      })
+      .compile();
 
     app = moduleRef.createNestApplication();
     prisma = moduleRef.get(PrismaService);

@@ -7,9 +7,12 @@ import { IdempotencyKey } from "@/domain/entities/idempotency-key";
 import { Notification } from "@/domain/entities/notification";
 import { NotificationPriority } from "@/domain/enums/notification-priority";
 import { NotificationStatus } from "@/domain/enums/notification-status";
+import { TemplateName } from "@/domain/value-objects/template-name";
 import { MESSAGE_PATTERNS } from "@/infra/messaging";
+
 import { FakeEventsService } from "__tests__/doubles/fake-events-service";
 import { IkFactory } from "__tests__/factories/ik-builder";
+import { NotificationFactory } from "__tests__/factories/notification-builder";
 import { UserFactory } from "__tests__/factories/user-builder";
 import { InMemoryIdempotencyKeyRepository } from "__tests__/repositories/in-memory-idempotency-key-repository";
 import { InMemoryNotificationRepository } from "__tests__/repositories/in-memory-notification-repository";
@@ -67,7 +70,7 @@ describe("Create Notification", () => {
         userId: userCreated.id.toString(),
         externalId: "unique-external-id",
         priority: NotificationPriority.HIGH,
-        templateName: "WELCOME_EMAIL"
+        templateName: "welcome-email"
       },
       headers: { ["idempotency-key"]: idempotencyKeyHash.toString() }
     });
@@ -94,7 +97,7 @@ describe("Create Notification", () => {
         userId: user.id.toString(),
         externalId: "unique-external-id",
         priority: NotificationPriority.HIGH,
-        templateName: "WELCOME_EMAIL"
+        templateName: "welcome-email"
       },
       headers: { ["idempotency-key"]: idempotencyKeyHash.toString() }
     });
@@ -143,7 +146,7 @@ describe("Create Notification", () => {
           userId: user.id.toString(),
           externalId: "ext-rollback",
           priority: NotificationPriority.HIGH,
-          templateName: "WELCOME_EMAIL"
+          templateName: "welcome-email"
         },
         headers: { ["idempotency-key"]: new UniqueEntityID().toString() }
       })
@@ -165,7 +168,7 @@ describe("Create Notification", () => {
         userId: "user123",
         externalId: "",
         priority: NotificationPriority.HIGH,
-        templateName: "WELCOME_EMAIL"
+        templateName: "welcome-email"
       },
       headers: { ["idempotency-key"]: new UniqueEntityID().toString() }
     });
@@ -185,12 +188,14 @@ describe("Create Notification", () => {
       body: "This is a test notification."
     };
 
+    const templateName = NotificationFactory.generateValidTemplateName();
+
     const notification = Notification.create({
       content,
       userId: userCreated.id,
       externalId,
       priority: NotificationPriority.HIGH,
-      templateName: "WELCOME_EMAIL",
+      templateName: templateName,
       status: NotificationStatus.PENDING
     });
 
@@ -209,7 +214,7 @@ describe("Create Notification", () => {
         userId: userCreated.id.toString(),
         externalId,
         priority: NotificationPriority.HIGH,
-        templateName: "WELCOME_EMAIL"
+        templateName: templateName.value
       },
       headers: { ["idempotency-key"]: fakeIk }
     });
@@ -235,7 +240,7 @@ describe("Create Notification", () => {
         userId: "user123",
         externalId: "unique-external-id",
         priority: NotificationPriority.HIGH,
-        templateName: "WELCOME_EMAIL"
+        templateName: "welcome-email"
       },
       headers: { ["idempotency-key"]: idempotencyKeyHash.toString() }
     });
@@ -257,12 +262,14 @@ describe("Create Notification", () => {
       body: "This is a test notification."
     };
 
+    const templateName = NotificationFactory.generateValidTemplateName();
+
     const notification = Notification.create({
       content,
       userId: userCreated.id,
       externalId: "duplicate-external-id",
       priority: NotificationPriority.HIGH,
-      templateName: "WELCOME_EMAIL",
+      templateName: templateName,
       status: NotificationStatus.PENDING
     });
 
@@ -277,7 +284,7 @@ describe("Create Notification", () => {
         userId: userCreated.id.toString(),
         externalId: "duplicate-external-id",
         priority: NotificationPriority.HIGH,
-        templateName: "WELCOME_EMAIL"
+        templateName: templateName.value
       },
       headers: { ["idempotency-key"]: ik }
     });
@@ -299,7 +306,7 @@ describe("Create Notification", () => {
         userId: user.id.toString(),
         externalId: "medium-priority-test",
         priority: NotificationPriority.MEDIUM,
-        templateName: "WELCOME_EMAIL"
+        templateName: "welcome-email"
       },
       headers: { ["idempotency-key"]: new UniqueEntityID().toString() }
     });
@@ -323,7 +330,7 @@ describe("Create Notification", () => {
         userId: user.id.toString(),
         externalId: "low-priority-test",
         priority: NotificationPriority.LOW,
-        templateName: "WELCOME_EMAIL"
+        templateName: "welcome-email"
       },
       headers: { ["idempotency-key"]: new UniqueEntityID().toString() }
     });

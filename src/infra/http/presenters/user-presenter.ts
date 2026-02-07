@@ -6,7 +6,7 @@ export class UserPresenter {
     return {
       id: user.id.toString(),
       email: user.email,
-      phoneNumber: user.phoneNumber,
+      phoneNumber: user.phoneNumber?.value ?? null,
       pushToken: user.pushToken,
       allowEmail: userPrefs.allowEmail,
       allowSMS: userPrefs.allowSMS,

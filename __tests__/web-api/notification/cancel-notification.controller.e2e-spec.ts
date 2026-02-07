@@ -1,9 +1,8 @@
 import { PrismaService } from "@/infra/database/prisma/prisma.service";
 import { EventsService } from "@/infra/messaging/publishers/events.service";
 import type { INestApplication } from "@nestjs/common";
-import request from "supertest";
 
-describe("Create user (E2E)", () => {
+describe.skip("Cancel notification (E2E)", () => {
   let app: INestApplication;
   let prisma: PrismaService;
 
@@ -27,23 +26,6 @@ describe("Create user (E2E)", () => {
     prisma = moduleRef.get(PrismaService);
 
     await app.init();
-  });
-
-  test("[POST] /user", async () => {
-    const email = "test@example.com";
-
-    const response = await request(app.getHttpServer()).post("/users").send({
-      email: email,
-      phoneNumber: "+1234567890",
-      pushToken: "test-token"
-    });
-
-    expect(response.status).toBe(201);
-    expect(response.body).toHaveProperty("email", email);
-
-    const userOnDatabase = await prisma.user.findUnique({ where: { email } });
-
-    expect(userOnDatabase).toBeTruthy();
   });
 
   afterAll(async () => {

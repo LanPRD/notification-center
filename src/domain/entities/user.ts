@@ -1,9 +1,10 @@
 import { Entity } from "@/core/entities/entity";
 import type { UniqueEntityID } from "@/core/entities/unique-entity-id";
+import type { PhoneNumber } from "@/domain/value-objects/phone-number";
 
 export interface UserProps {
   email: string;
-  phoneNumber?: string | null;
+  phoneNumber?: PhoneNumber | null;
   pushToken?: string | null;
 }
 
@@ -12,11 +13,11 @@ export class User extends Entity<UserProps> {
     return this.props.email;
   }
 
-  public get phoneNumber(): string | null {
+  public get phoneNumber(): PhoneNumber | null {
     return this.props.phoneNumber ?? null;
   }
 
-  public set phoneNumber(phoneNumber: string | null) {
+  public set phoneNumber(phoneNumber: PhoneNumber | null) {
     this.props.phoneNumber = phoneNumber;
   }
 

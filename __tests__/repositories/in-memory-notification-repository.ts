@@ -12,7 +12,7 @@ export class InMemoryNotificationRepository implements NotificationRepository {
       content: n.content,
       userId: n.userId,
       externalId: n.externalId,
-      templateName: n.templateName,
+      templateName: n.templateName.value,
       priority: n.priority,
       status: n.status,
       createdAt: n.createdAt,

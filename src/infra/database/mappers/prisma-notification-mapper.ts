@@ -4,6 +4,7 @@ import { Notification } from "@/domain/entities/notification";
 import type { NotificationLogStatus } from "@/domain/enums/notification-log-status";
 import type { NotificationPriority } from "@/domain/enums/notification-priority";
 import type { NotificationStatus } from "@/domain/enums/notification-status";
+import { TemplateName } from "@/domain/value-objects/template-name";
 import type {
   Prisma,
   Notification as PrismaNotification,
@@ -13,13 +14,19 @@ import type {
 
 export class PrismaNotificationMapper {
   static toDomain(raw: PrismaNotification): Notification {
+    const templateNameOrError = TemplateName.create(raw.templateName);
+
+    if (templateNameOrError.isLeft()) {
+      throw new Error(`Invalid template name in database: ${raw.templateName}`);
+    }
+
     return Notification.create(
       {
         content: raw.content,
         externalId: raw.externalId,
         userId: new UniqueEntityID(raw.userId),
         createdAt: raw.createdAt,
-        templateName: raw.templateName,
+        templateName: templateNameOrError.value,
         priority: raw.priority as NotificationPriority,
         status: raw.status as NotificationStatus
       },
@@ -33,7 +40,7 @@ export class PrismaNotificationMapper {
     return {
       content: notification.content,
       externalId: notification.externalId,
-      templateName: notification.templateName,
+      templateName: notification.templateName.value,
       priority: notification.priority,
       status: notification.status,
       createdAt: notification.createdAt,
@@ -77,7 +84,7 @@ export class PrismaNotificationMapper {
       id: notification.id.toString(),
       content: notification.content as Prisma.InputJsonValue,
       externalId: notification.externalId,
-      templateName: notification.templateName,
+      templateName: notification.templateName.value,
       priority: notification.priority,
       status: notification.status,
       createdAt: notification.createdAt.toISOString(),

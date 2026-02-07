@@ -1,6 +1,7 @@
 import { UniqueEntityID } from "@/core/entities/unique-entity-id";
 import { DatabaseModule } from "@/infra/database/database.module";
 import { PrismaService } from "@/infra/database/prisma/prisma.service";
+import { EventsService } from "@/infra/messaging/publishers/events.service";
 import type { INestApplication } from "@nestjs/common";
 import { PrismaUserFactory } from "__tests__/factories/user-builder";
 import { PrismaUserPreferenceFactory } from "__tests__/factories/user-preference-builder";
@@ -19,7 +20,15 @@ describe("Update user preference (E2E)", () => {
     const moduleRef = await Test.createTestingModule({
       imports: [AppModule, DatabaseModule],
       providers: [PrismaUserFactory, PrismaUserPreferenceFactory]
-    }).compile();
+    })
+      .overrideProvider(EventsService)
+      .useValue({
+        emit: vi.fn(),
+        emitHigh: vi.fn(),
+        emitMedium: vi.fn(),
+        emitLow: vi.fn()
+      })
+      .compile();
 
     app = moduleRef.createNestApplication();
     prisma = moduleRef.get(PrismaService);
